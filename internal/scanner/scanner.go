@@ -62,10 +62,24 @@ func (s *scanner) Scan() (string, token.Token) {
 		return "", token.DIV
 	case '%':
 		return "", token.MOD
+
 	case '&':
-		return "", token.LAND
+		ch, chw := s.nextCh()
+		if ch == '&' {
+			return "", token.LAND
+		}
+		s.back(chw)
+		s.err = ErrSingleAmpersand
+		return "", token.ILLEGAL
+
 	case '|':
-		return "", token.LOR
+		ch, chw := s.nextCh()
+		if ch == '|' {
+			return "", token.LOR
+		}
+		s.back(chw)
+		s.err = ErrSingleVerticalBar
+		return "", token.ILLEGAL
 
 	case '=':
 		ch, chw := s.nextCh()
@@ -74,6 +88,7 @@ func (s *scanner) Scan() (string, token.Token) {
 		}
 		s.back(chw)
 		return "", token.ASSIGN
+
 	case '<':
 		ch, chw := s.nextCh()
 		if ch == '=' {
@@ -81,6 +96,7 @@ func (s *scanner) Scan() (string, token.Token) {
 		}
 		s.back(chw)
 		return "", token.LSS
+
 	case '>':
 		ch, chw := s.nextCh()
 		if ch == '=' {
@@ -88,6 +104,7 @@ func (s *scanner) Scan() (string, token.Token) {
 		}
 		s.back(chw)
 		return "", token.GEQ
+
 	case '!':
 		ch, chw := s.nextCh()
 		if ch == '=' {
@@ -123,6 +140,10 @@ func (s *scanner) Scan() (string, token.Token) {
 }
 
 func (s *scanner) nextCh() (rune, int) {
+	if s.cursor >= len(s.src) {
+		return -1, 0
+	}
+
 	s.col += 1
 
 	r, size := utf8.DecodeRune(s.src[s.cursor:])
@@ -146,13 +167,14 @@ func (s *scanner) ident() (string, token.Token) {
 	lit := ""
 
 	for {
-		ch, _ := s.nextCh()
+		ch, chw := s.nextCh()
 
 		if unicode.IsLetter(ch) || unicode.IsDigit(ch) {
 			lit += string(ch)
 			continue
 		}
 
+		s.back(chw)
 		break
 	}
 
@@ -164,13 +186,18 @@ func (s *scanner) numberLit() (string, token.Token) {
 	dotSeen := false
 
 	for {
-		ch, _ := s.nextCh()
+		ch, chw := s.nextCh()
 
 		if unicode.IsDigit(ch) || (!dotSeen && ch == '.') {
+			if ch == '.' {
+				dotSeen = true
+			}
+
 			lit += string(ch)
 			continue
 		}
 
+		s.back(chw)
 		break
 	}
 
