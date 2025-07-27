@@ -135,11 +135,11 @@ func init() {
 	}
 }
 
-func Lookup(ident string) Token {
+func Lookup(ident string) (Token, bool) {
 	if tok, ok := keywords[ident]; ok {
-		return tok
+		return tok, true
 	}
-	return IDENT
+	return 0, false
 }
 
 func (t Token) IsLiteral() bool { return literal_beg < t && t < literal_end }

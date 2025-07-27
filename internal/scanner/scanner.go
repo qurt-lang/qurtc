@@ -62,6 +62,7 @@ start:
 	case '*':
 		return "", token.MUL
 	case '/':
+		// TODO: add comment consuming and returning comment token here
 		return "", token.DIV
 	case '%':
 		return "", token.MOD
@@ -179,6 +180,11 @@ func (s *scanner) ident() (string, token.Token) {
 
 		s.back(chw)
 		break
+	}
+
+	tok, ok := token.Lookup(lit)
+	if ok {
+		return lit, tok
 	}
 
 	return lit, token.IDENT
