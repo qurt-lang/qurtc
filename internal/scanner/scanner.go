@@ -28,7 +28,16 @@ func (s *scanner) Pos() (int, int) {
 }
 
 func (s *scanner) Scan() (string, token.Token) {
+start:
 	ch, chw := s.nextCh()
+
+	if ch == '\n' {
+		return "", token.SEMICOLON
+	}
+
+	if unicode.IsSpace(ch) {
+		goto start
+	}
 
 	if unicode.IsLetter(ch) {
 		s.back(chw)
@@ -39,12 +48,6 @@ func (s *scanner) Scan() (string, token.Token) {
 
 	case -1:
 		return "", token.EOF
-
-	case '\n':
-		s.line++
-		s.col = 0
-		return "", token.SEMICOLON
-
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		s.back(chw)
 		return s.numberLit()

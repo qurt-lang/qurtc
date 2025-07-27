@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	input := "hello();hahahah\n12123.&&"
+	input := "hello();hahahah\n12123.&&;a=b\nb=a\nегер(true){hello()};қайтала(i=1;i<6;i = i+1){a = a + 1}"
 	fmt.Println(input)
 
 	s := scanner.New([]byte(input))
