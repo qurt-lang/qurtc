@@ -7,139 +7,201 @@ import (
 	"github.com/nurtai325/qurt/internal/token"
 )
 
-type scanner struct {
-	src    []byte
-	err    error
-	cursor int
-	line   int
-	col    int
+type Scanner interface {
+	Scan() bool
+	Lit() string
+	Tok() token.Token
+	Pos() Pos
+	Err() error
 }
 
-func New(src []byte) *scanner {
+type scanner struct {
+	filename string
+	src      []byte
+	err      error
+	cursor   int
+	line     int
+	col      int
+	tok      token.Token
+	lit      string
+}
+
+func New(filename string, src []byte) Scanner {
 	s := scanner{
+		filename: filename,
 		// TODO: use io.Reader and buffer instead of []byte
 		src: src,
 	}
 	return &s
 }
 
-func (s *scanner) Pos() (int, int) {
-	return s.line, s.col
+type Pos interface {
+	File() string
+	Line() int
+	Col() int
 }
 
-func (s *scanner) Scan() (string, token.Token) {
-start:
+type pos struct {
+	filename  string
+	line, col int
+}
+
+func (p pos) File() string {
+	return p.filename
+}
+
+func (p pos) Line() int {
+	return p.line
+}
+
+func (p pos) Col() int {
+	return p.col
+}
+
+func (s *scanner) Pos() Pos {
+	return pos{
+		filename: s.filename,
+		line:     s.line,
+		col:      s.col,
+	}
+}
+
+func (s *scanner) Lit() string {
+	return s.lit
+}
+
+func (s *scanner) Tok() token.Token {
+	return s.tok
+}
+
+func (s *scanner) Scan() bool {
 	ch, chw := s.nextCh()
 
 	if ch == '\n' {
-		return "", token.SEMICOLON
+		s.lit = "newline"
+		s.tok = token.SEMICOLON
+		return true
 	}
 
-	if unicode.IsSpace(ch) {
-		goto start
+	for unicode.IsSpace(ch) {
+		ch, chw = s.nextCh()
 	}
 
 	if unicode.IsLetter(ch) {
 		s.back(chw)
-		return s.ident()
+		s.ident()
+		return true
 	}
 
 	switch ch {
 
 	case -1:
-		return "", token.EOF
+		s.lit = ""
+		s.tok = token.EOF
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		s.back(chw)
-		return s.numberLit()
+		s.numberLit()
 	case '"':
 		s.back(chw)
-		return s.stringLit()
+		s.stringLit()
 
 	case '+':
-		return "", token.ADD
+		s.lit, s.tok = "", token.ADD
 	case '-':
-		return "", token.SUB
+		s.lit, s.tok = "", token.SUB
 	case '*':
-		return "", token.MUL
+		s.lit, s.tok = "", token.MUL
 	case '/':
 		// TODO: add comment consuming and returning comment token here
-		return "", token.DIV
+		s.lit, s.tok = "", token.DIV
 	case '%':
-		return "", token.MOD
+		s.lit, s.tok = "", token.MOD
 
 	case '&':
 		ch, chw := s.nextCh()
 		if ch == '&' {
-			return "", token.LAND
+			s.lit, s.tok = "", token.LAND
+		} else {
+			s.back(chw)
+			s.err = ErrSingleAmpersand
+			s.lit, s.tok = "", token.ILLEGAL
 		}
-		s.back(chw)
-		s.err = ErrSingleAmpersand
-		return "", token.ILLEGAL
-
 	case '|':
 		ch, chw := s.nextCh()
 		if ch == '|' {
-			return "", token.LOR
+			s.lit, s.tok = "", token.LOR
+		} else {
+			s.back(chw)
+			s.err = ErrSingleVerticalBar
+			s.lit, s.tok = "", token.ILLEGAL
 		}
-		s.back(chw)
-		s.err = ErrSingleVerticalBar
-		return "", token.ILLEGAL
 
 	case '=':
 		ch, chw := s.nextCh()
 		if ch == '=' {
-			return "", token.EQL
+			s.lit, s.tok = "", token.EQL
+		} else {
+			s.back(chw)
+			s.lit, s.tok = "", token.ASSIGN
 		}
-		s.back(chw)
-		return "", token.ASSIGN
 
 	case '<':
 		ch, chw := s.nextCh()
 		if ch == '=' {
-			return "", token.LEQ
+			s.lit, s.tok = "", token.LEQ
+		} else {
+			s.back(chw)
+			s.lit, s.tok = "", token.LSS
 		}
-		s.back(chw)
-		return "", token.LSS
 
 	case '>':
 		ch, chw := s.nextCh()
 		if ch == '=' {
-			return "", token.GTR
+			s.lit, s.tok = "", token.GTR
+		} else {
+			s.back(chw)
+			s.lit, s.tok = "", token.GEQ
 		}
-		s.back(chw)
-		return "", token.GEQ
 
 	case '!':
 		ch, chw := s.nextCh()
 		if ch == '=' {
-			return "", token.NEQ
+			s.lit, s.tok = "", token.NEQ
+		} else {
+			s.back(chw)
+			s.lit, s.tok = "", token.NOT
 		}
-		s.back(chw)
-		return "", token.NOT
 
 	case '(':
-		return "", token.LPAREN
+		s.lit, s.tok = "", token.LPAREN
 	case '[':
-		return "", token.LBRACK
+		s.lit, s.tok = "", token.LBRACK
 	case '{':
-		return "", token.LBRACE
+		s.lit, s.tok = "", token.LBRACE
 	case ',':
-		return "", token.COMMA
+		s.lit, s.tok = "", token.COMMA
 	case '.':
-		return "", token.PERIOD
+		s.lit, s.tok = "", token.PERIOD
 	case ')':
-		return "", token.RPAREN
+		s.lit, s.tok = "", token.RPAREN
 	case ']':
-		return "", token.RBRACK
+		s.lit, s.tok = "", token.RBRACK
 	case '}':
-		return "", token.RBRACE
+		s.lit, s.tok = "", token.RBRACE
 	case ':':
-		return "", token.COLON
+		s.lit, s.tok = "", token.COLON
 	case ';':
-		return "", token.SEMICOLON
+		s.lit, s.tok = "semicolon", token.SEMICOLON
+
 	default:
 		s.err = ErrInvalidCharacter
-		return "", token.ILLEGAL
+		s.lit, s.tok = "", token.ILLEGAL
+	}
+
+	if s.tok == token.EOF || s.tok == token.ILLEGAL {
+		return false
+	} else {
+		return true
 	}
 }
 
@@ -167,7 +229,7 @@ func (s *scanner) back(chw int) {
 	s.cursor -= chw
 }
 
-func (s *scanner) ident() (string, token.Token) {
+func (s *scanner) ident() {
 	lit := ""
 
 	for {
@@ -184,13 +246,15 @@ func (s *scanner) ident() (string, token.Token) {
 
 	tok, ok := token.Lookup(lit)
 	if ok {
-		return lit, tok
+		s.lit = lit
+		s.tok = tok
+	} else {
+		s.lit = lit
+		s.tok = token.IDENT
 	}
-
-	return lit, token.IDENT
 }
 
-func (s *scanner) numberLit() (string, token.Token) {
+func (s *scanner) numberLit() {
 	lit := ""
 	dotSeen := false
 
@@ -211,13 +275,15 @@ func (s *scanner) numberLit() (string, token.Token) {
 	}
 
 	if dotSeen {
-		return lit, token.FLOAT
+		s.lit = lit
+		s.tok = token.FLOAT
 	} else {
-		return lit, token.INT
+		s.lit = lit
+		s.tok = token.FLOAT
 	}
 }
 
-func (s *scanner) stringLit() (string, token.Token) {
+func (s *scanner) stringLit() {
 	// skip first '"'
 	_, _ = s.nextCh()
 
@@ -235,9 +301,10 @@ func (s *scanner) stringLit() (string, token.Token) {
 		lit += string(ch)
 	}
 
-	return lit, token.STRING
+	s.lit = lit
+	s.tok = token.STRING
 }
 
-func (s *scanner) Error() error {
+func (s *scanner) Err() error {
 	return s.err
 }

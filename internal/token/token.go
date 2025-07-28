@@ -60,7 +60,6 @@ const (
 	RETURN
 
 	STRUCT
-	SWITCH
 	VAR
 	keyword_end
 )
@@ -78,6 +77,8 @@ var tokens = [...]string{
 	ADD: "+",
 	SUB: "-",
 	MUL: "*",
+	DIV: "/",
+	MOD: "%",
 
 	LAND: "&&",
 	LOR:  "||",
@@ -118,7 +119,6 @@ var tokens = [...]string{
 	RETURN: "қайтар",
 
 	STRUCT: "құрылым",
-	SWITCH: "таңда",
 	VAR:    "айнымалы",
 }
 
@@ -147,3 +147,26 @@ func (t Token) IsLiteral() bool { return literal_beg < t && t < literal_end }
 func (t Token) IsOperator() bool { return literal_beg < t && t < literal_end }
 
 func (t Token) IsKeyword() bool { return literal_beg < t && t < literal_end }
+
+type Operator int
+
+const (
+	_ Operator = iota
+
+	Add // +
+	Sub // -
+	Mul // *
+	Mod // %
+
+	AndAnd // &&
+	OrOr   // ||
+
+	Eql // ==
+	Lss // <
+	Gtr // >
+	Not // !
+
+	Neq // !=
+	Leq // <=
+	Geq // >=
+)
