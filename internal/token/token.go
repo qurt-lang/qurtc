@@ -47,20 +47,18 @@ const (
 	operator_end
 
 	keyword_beg
-	BREAK
-	CASE
-	CONTINUE
+	BREAK    // тоқта
+	CONTINUE // өткіз
 
-	DEFAULT
-	ELSE
-	FOR
+	ELSE // әйтпесе
+	FOR  // қайтала
 
-	FUNC
-	IF
-	RETURN
+	FUNC   // функция
+	IF     // егер
+	RETURN // қайтар
 
-	STRUCT
-	VAR
+	STRUCT // құрылым
+	VAR    // айнымалы
 	keyword_end
 )
 
@@ -106,12 +104,10 @@ var tokens = [...]string{
 	SEMICOLON: ";",
 
 	BREAK:    "тоқта",
-	CASE:     "нұсқа",
 	CONTINUE: "өткіз",
 
-	DEFAULT: "әдепкі",
-	ELSE:    "әйтпесе",
-	FOR:     "қайтала",
+	ELSE: "әйтпесе",
+	FOR:  "қайтала",
 
 	FUNC: "функция",
 	IF:   "егер",
@@ -144,9 +140,9 @@ func Lookup(ident string) (Token, bool) {
 
 func (t Token) IsLiteral() bool { return literal_beg < t && t < literal_end }
 
-func (t Token) IsOperator() bool { return literal_beg < t && t < literal_end }
+func (t Token) IsOperator() bool { return operator_beg < t && t < operator_end }
 
-func (t Token) IsKeyword() bool { return literal_beg < t && t < literal_end }
+func (t Token) IsKeyword() bool { return keyword_beg < t && t < keyword_end }
 
 type Operator int
 

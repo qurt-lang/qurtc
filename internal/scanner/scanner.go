@@ -77,7 +77,7 @@ func (s *scanner) Tok() token.Token {
 func (s *scanner) Scan() bool {
 	ch, chw := s.nextCh()
 
-	if ch == '\n' {
+	if ch == '\n' && s.tok != token.SEMICOLON {
 		s.lit = "newline"
 		s.tok = token.SEMICOLON
 		return true
@@ -96,7 +96,7 @@ func (s *scanner) Scan() bool {
 	switch ch {
 
 	case -1:
-		s.lit = ""
+		s.lit = token.EOF.String()
 		s.tok = token.EOF
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		s.back(chw)
@@ -106,96 +106,96 @@ func (s *scanner) Scan() bool {
 		s.stringLit()
 
 	case '+':
-		s.lit, s.tok = "", token.ADD
+		s.lit, s.tok = token.ADD.String(), token.ADD
 	case '-':
-		s.lit, s.tok = "", token.SUB
+		s.lit, s.tok = token.SUB.String(), token.SUB
 	case '*':
-		s.lit, s.tok = "", token.MUL
+		s.lit, s.tok = token.MUL.String(), token.MUL
 	case '/':
 		// TODO: add comment consuming and returning comment token here
-		s.lit, s.tok = "", token.DIV
+		s.lit, s.tok = token.DIV.String(), token.DIV
 	case '%':
-		s.lit, s.tok = "", token.MOD
+		s.lit, s.tok = token.MOD.String(), token.MOD
 
 	case '&':
 		ch, chw := s.nextCh()
 		if ch == '&' {
-			s.lit, s.tok = "", token.LAND
+			s.lit, s.tok = token.LAND.String(), token.LAND
 		} else {
 			s.back(chw)
 			s.err = ErrSingleAmpersand
-			s.lit, s.tok = "", token.ILLEGAL
+			s.lit, s.tok = token.ILLEGAL.String(), token.ILLEGAL
 		}
 	case '|':
 		ch, chw := s.nextCh()
 		if ch == '|' {
-			s.lit, s.tok = "", token.LOR
+			s.lit, s.tok = token.LOR.String(), token.LOR
 		} else {
 			s.back(chw)
 			s.err = ErrSingleVerticalBar
-			s.lit, s.tok = "", token.ILLEGAL
+			s.lit, s.tok = token.ILLEGAL.String(), token.ILLEGAL
 		}
 
 	case '=':
 		ch, chw := s.nextCh()
 		if ch == '=' {
-			s.lit, s.tok = "", token.EQL
+			s.lit, s.tok = token.EQL.String(), token.EQL
 		} else {
 			s.back(chw)
-			s.lit, s.tok = "", token.ASSIGN
+			s.lit, s.tok = token.ASSIGN.String(), token.ASSIGN
 		}
 
 	case '<':
 		ch, chw := s.nextCh()
 		if ch == '=' {
-			s.lit, s.tok = "", token.LEQ
+			s.lit, s.tok = token.LEQ.String(), token.LEQ
 		} else {
 			s.back(chw)
-			s.lit, s.tok = "", token.LSS
+			s.lit, s.tok = token.LSS.String(), token.LSS
 		}
 
 	case '>':
 		ch, chw := s.nextCh()
 		if ch == '=' {
-			s.lit, s.tok = "", token.GTR
+			s.lit, s.tok = token.GEQ.String(), token.GEQ
 		} else {
 			s.back(chw)
-			s.lit, s.tok = "", token.GEQ
+			s.lit, s.tok = token.GTR.String(), token.GTR
 		}
 
 	case '!':
 		ch, chw := s.nextCh()
 		if ch == '=' {
-			s.lit, s.tok = "", token.NEQ
+			s.lit, s.tok = token.NEQ.String(), token.NEQ
 		} else {
 			s.back(chw)
-			s.lit, s.tok = "", token.NOT
+			s.lit, s.tok = token.NOT.String(), token.NOT
 		}
 
 	case '(':
-		s.lit, s.tok = "", token.LPAREN
+		s.lit, s.tok = token.LPAREN.String(), token.LPAREN
 	case '[':
-		s.lit, s.tok = "", token.LBRACK
+		s.lit, s.tok = token.LBRACK.String(), token.LBRACK
 	case '{':
-		s.lit, s.tok = "", token.LBRACE
+		s.lit, s.tok = token.LBRACE.String(), token.LBRACE
 	case ',':
-		s.lit, s.tok = "", token.COMMA
+		s.lit, s.tok = token.COMMA.String(), token.COMMA
 	case '.':
-		s.lit, s.tok = "", token.PERIOD
+		s.lit, s.tok = token.PERIOD.String(), token.PERIOD
 	case ')':
-		s.lit, s.tok = "", token.RPAREN
+		s.lit, s.tok = token.RPAREN.String(), token.RPAREN
 	case ']':
-		s.lit, s.tok = "", token.RBRACK
+		s.lit, s.tok = token.RBRACK.String(), token.RBRACK
 	case '}':
-		s.lit, s.tok = "", token.RBRACE
+		s.lit, s.tok = token.RBRACE.String(), token.RBRACE
 	case ':':
-		s.lit, s.tok = "", token.COLON
+		s.lit, s.tok = token.COLON.String(), token.COLON
 	case ';':
 		s.lit, s.tok = "semicolon", token.SEMICOLON
 
 	default:
 		s.err = ErrInvalidCharacter
-		s.lit, s.tok = "", token.ILLEGAL
+		s.lit, s.tok = token.ILLEGAL.String(), token.ILLEGAL
 	}
 
 	if s.tok == token.EOF || s.tok == token.ILLEGAL {
@@ -279,7 +279,7 @@ func (s *scanner) numberLit() {
 		s.tok = token.FLOAT
 	} else {
 		s.lit = lit
-		s.tok = token.FLOAT
+		s.tok = token.INT
 	}
 }
 
@@ -295,6 +295,7 @@ func (s *scanner) stringLit() {
 		if ch == '"' {
 			break
 		} else if ch == '\\' {
+			lit += string(ch)
 			ch, _ = s.nextCh()
 		}
 

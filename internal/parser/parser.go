@@ -20,7 +20,7 @@ func (p *parser) Parse() ([]ast.Decl, error) {
 	var decls []ast.Decl
 
 	for p.s.Scan() {
-		lit, tok := p.s.Lit(), p.s.Tok()
+		_, tok := p.s.Lit(), p.s.Tok()
 		if tok == token.EOF {
 			break
 		} else if tok == token.ILLEGAL {
