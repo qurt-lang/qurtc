@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/nurtai325/qurt/internal/scanner"
-	"github.com/nurtai325/qurt/internal/token"
+	"github.com/nurtai325/qurtc/internal/scanner"
+	"github.com/nurtai325/qurtc/internal/token"
 )
 
 func main() {

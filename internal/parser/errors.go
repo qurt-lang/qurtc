@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/nurtai325/qurt/internal/help"
+	"github.com/nurtai325/qurtc/internal/help"
 )
 
 var (

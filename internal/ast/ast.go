@@ -1,6 +1,6 @@
 package ast
 
-import "github.com/nurtai325/qurt/internal/token"
+import "github.com/nurtai325/qurtc/internal/token"
 
 type Node interface {
 	aNode()

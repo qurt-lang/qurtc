@@ -4,7 +4,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/nurtai325/qurt/internal/token"
+	"github.com/nurtai325/qurtc/internal/token"
 )
 
 type Scanner interface {

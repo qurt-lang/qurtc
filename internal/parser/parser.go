@@ -1,9 +1,9 @@
 package parser
 
 import (
-	"github.com/nurtai325/qurt/internal/ast"
-	"github.com/nurtai325/qurt/internal/scanner"
-	"github.com/nurtai325/qurt/internal/token"
+	"github.com/nurtai325/qurtc/internal/ast"
+	"github.com/nurtai325/qurtc/internal/scanner"
+	"github.com/nurtai325/qurtc/internal/token"
 )
 
 type parser struct {
