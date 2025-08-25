@@ -94,7 +94,6 @@ func (s *scanner) Scan() bool {
 	}
 
 	switch ch {
-
 	case -1:
 		s.lit = token.EOF.String()
 		s.tok = token.EOF
@@ -117,6 +116,7 @@ func (s *scanner) Scan() bool {
 	case '%':
 		s.lit, s.tok = token.MOD.String(), token.MOD
 
+	// TODO: all similar repeated code for consuming these two character operators. move to a reusable function
 	case '&':
 		ch, chw := s.nextCh()
 		if ch == '&' {

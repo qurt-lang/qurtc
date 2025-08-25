@@ -27,14 +27,15 @@ type (
 
 	VarDecl struct {
 		Name *NameExpr
-		Type Kind
+		Type Type
 		decl
 	}
 
 	FuncDecl struct {
-		Name *NameExpr
-		Args []Kind
-		Body []Stmt
+		Name       *NameExpr
+		Args       []Type
+		ReturnType Type
+		Body       []Stmt
 		decl
 	}
 )
@@ -92,9 +93,21 @@ type (
 		expr
 	}
 
+	ArrayExpr struct {
+		Length   int
+		Elements []Expr
+		expr
+	}
+
+	ArrayAccessExpr struct {
+		Array *NameExpr
+		Index *Expr
+		expr
+	}
+
 	Field struct {
 		Name string
-		Type Kind
+		Type Type
 	}
 )
 
@@ -162,12 +175,19 @@ func (*stmt) aStmt() {}
 // Types
 // ----------------------------------------------------------------------------
 
-// TODO: when adding types like slice and maps make use expressions instead of just Kind enum. Move builtin types to new types package
+type Type struct {
+	Kind    Kind
+	Name    *NameExpr
+	IsArray bool
+	Length  int
+}
 
 type Kind int
 
 const (
-	StructKind Kind = iota
-	IntKind
-	FloatKind
+	Unknown Kind = iota
+	TStruct
+	TInt
+	TFloat
+	TString
 )
