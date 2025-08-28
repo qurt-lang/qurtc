@@ -28,6 +28,7 @@ type (
 	VarDecl struct {
 		Name *NameExpr
 		Type Type
+		Val  Expr
 		decl
 	}
 

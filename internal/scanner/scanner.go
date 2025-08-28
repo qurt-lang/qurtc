@@ -76,17 +76,14 @@ func (s *scanner) Tok() token.Token {
 
 func (s *scanner) Scan() bool {
 	ch, chw := s.nextCh()
-
 	if ch == '\n' && s.tok != token.SEMICOLON {
 		s.lit = "newline"
 		s.tok = token.SEMICOLON
 		return true
 	}
-
 	for unicode.IsSpace(ch) {
 		ch, chw = s.nextCh()
 	}
-
 	if unicode.IsLetter(ch) {
 		s.back(chw)
 		s.ident()
@@ -103,7 +100,6 @@ func (s *scanner) Scan() bool {
 	case '"':
 		s.back(chw)
 		s.stringLit()
-
 	case '+':
 		s.lit, s.tok = token.ADD.String(), token.ADD
 	case '-':
@@ -115,8 +111,6 @@ func (s *scanner) Scan() bool {
 		s.lit, s.tok = token.DIV.String(), token.DIV
 	case '%':
 		s.lit, s.tok = token.MOD.String(), token.MOD
-
-	// TODO: all similar repeated code for consuming these two character operators. move to a reusable function
 	case '&':
 		ch, chw := s.nextCh()
 		if ch == '&' {
@@ -135,7 +129,6 @@ func (s *scanner) Scan() bool {
 			s.err = ErrSingleVerticalBar
 			s.lit, s.tok = token.ILLEGAL.String(), token.ILLEGAL
 		}
-
 	case '=':
 		ch, chw := s.nextCh()
 		if ch == '=' {
@@ -144,7 +137,6 @@ func (s *scanner) Scan() bool {
 			s.back(chw)
 			s.lit, s.tok = token.ASSIGN.String(), token.ASSIGN
 		}
-
 	case '<':
 		ch, chw := s.nextCh()
 		if ch == '=' {
@@ -153,7 +145,6 @@ func (s *scanner) Scan() bool {
 			s.back(chw)
 			s.lit, s.tok = token.LSS.String(), token.LSS
 		}
-
 	case '>':
 		ch, chw := s.nextCh()
 		if ch == '=' {
@@ -162,7 +153,6 @@ func (s *scanner) Scan() bool {
 			s.back(chw)
 			s.lit, s.tok = token.GTR.String(), token.GTR
 		}
-
 	case '!':
 		ch, chw := s.nextCh()
 		if ch == '=' {
@@ -171,7 +161,6 @@ func (s *scanner) Scan() bool {
 			s.back(chw)
 			s.lit, s.tok = token.NOT.String(), token.NOT
 		}
-
 	case '(':
 		s.lit, s.tok = token.LPAREN.String(), token.LPAREN
 	case '[':
@@ -192,7 +181,6 @@ func (s *scanner) Scan() bool {
 		s.lit, s.tok = token.COLON.String(), token.COLON
 	case ';':
 		s.lit, s.tok = "semicolon", token.SEMICOLON
-
 	default:
 		s.err = ErrInvalidCharacter
 		s.lit, s.tok = token.ILLEGAL.String(), token.ILLEGAL
@@ -209,20 +197,16 @@ func (s *scanner) nextCh() (rune, int) {
 	if s.cursor >= len(s.src) {
 		return -1, 0
 	}
-
 	s.col += 1
-
 	r, size := utf8.DecodeRune(s.src[s.cursor:])
 	if r != utf8.RuneError {
 		s.cursor += size
 		return r, size
 	}
-
 	if size == 0 {
 		return -1, 0
-	} else {
-		return utf8.RuneError, 0
 	}
+	return utf8.RuneError, 0
 }
 
 func (s *scanner) back(chw int) {
@@ -231,19 +215,15 @@ func (s *scanner) back(chw int) {
 
 func (s *scanner) ident() {
 	lit := ""
-
 	for {
 		ch, chw := s.nextCh()
-
 		if unicode.IsLetter(ch) || unicode.IsDigit(ch) {
 			lit += string(ch)
 			continue
 		}
-
 		s.back(chw)
 		break
 	}
-
 	tok, ok := token.Lookup(lit)
 	if ok {
 		s.lit = lit
@@ -257,23 +237,18 @@ func (s *scanner) ident() {
 func (s *scanner) numberLit() {
 	lit := ""
 	dotSeen := false
-
 	for {
 		ch, chw := s.nextCh()
-
 		if unicode.IsDigit(ch) || (!dotSeen && ch == '.') {
 			if ch == '.' {
 				dotSeen = true
 			}
-
 			lit += string(ch)
 			continue
 		}
-
 		s.back(chw)
 		break
 	}
-
 	if dotSeen {
 		s.lit = lit
 		s.tok = token.FLOAT
@@ -286,9 +261,7 @@ func (s *scanner) numberLit() {
 func (s *scanner) stringLit() {
 	// skip first '"'
 	_, _ = s.nextCh()
-
 	lit := ""
-
 	for {
 		ch, _ := s.nextCh()
 
@@ -298,10 +271,8 @@ func (s *scanner) stringLit() {
 			lit += string(ch)
 			ch, _ = s.nextCh()
 		}
-
 		lit += string(ch)
 	}
-
 	s.lit = lit
 	s.tok = token.STRING
 }

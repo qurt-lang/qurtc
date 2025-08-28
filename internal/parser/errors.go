@@ -8,13 +8,17 @@ import (
 )
 
 var (
-	ErrUnknownDecl     = errors.New("Функция сыртында тек жаңа айнымалы, функция, құрылым жариялауға ғана болады")
-	ErrUnexpectedEOF   = errors.New("Файл күтпеген жерден аяқталады")
-	ErrUnexpectedToken = errors.New("Күтпеген таңба")
+	ErrUnknownDecl     = errors.New("функция сыртында тек жаңа айнымалы, функция, құрылым жариялауға ғана болады")
+	ErrUnexpectedEOF   = errors.New("файл күтпеген жерден аяқталады")
+	ErrUnexpectedToken = errors.New("күтпеген таңба немесе cөз")
+
+	ErrInvalidFuncDecl   = errors.New("функция жариялаудың ережелері сақталмаған")
+	ErrInvalidStructDecl = errors.New("құрылым жариялаудың ережелері сақталмаған")
+	ErrInvalidVarDecl    = errors.New("айнымалы жариялаудың ережелері сақталмаған")
 )
 
 func (p *parser) errorAt(err error, helpPage help.DocPage) error {
-	errTempl := "Синтаксис қатесі (файл: %s, жол: %d, қатар: %d):\n\t%s\n"
+	errTempl := "Синтаксис қатесі (файл: %s, жол: %d, қатар: %d):\n\t%s\n\n"
 
 	if helpPage != "" {
 		errTempl += fmt.Sprintf("Мына сілтеме сізге қатеңізді түзеуге көмектесуі мүмкін: %s\n", helpPage)
@@ -23,6 +27,5 @@ func (p *parser) errorAt(err error, helpPage help.DocPage) error {
 	}
 
 	pos := p.s.Pos()
-
 	return fmt.Errorf(errTempl, pos.File(), pos.Line(), pos.Col(), err.Error())
 }
