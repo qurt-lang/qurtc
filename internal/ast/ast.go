@@ -185,16 +185,37 @@ type Type struct {
 	Kind    Kind
 	Name    *NameExpr
 	IsArray bool
-	Length  int
+	ArrayLen  int
 }
 
 type Kind int
 
+func GetKind(typeName string) Kind {
+	switch typeName {
+	case types[TVoid]:
+		return TVoid
+	case types[TInt]:
+		return TInt
+	case types[TFloat]:
+		return TFloat
+	case types[TString]:
+		return TString
+	default:
+		return TStruct
+	}
+}
+
 const (
-	Unknown Kind = iota
-	TVoid
-	TStruct
+	TVoid Kind = iota
 	TInt
 	TFloat
 	TString
+	TStruct
 )
+
+var types = [...]string{
+	TVoid:   "ештеңе",
+	TInt:    "бүтін",
+	TFloat:  "бөлшек",
+	TString: "жол",
+}

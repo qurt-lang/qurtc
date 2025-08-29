@@ -18,6 +18,7 @@ var (
 )
 
 func (p *parser) errorAt(err error, helpPage help.DocPage) error {
+	// TODO: add source context line
 	errTempl := "Синтаксис қатесі (файл: %s, жол: %d, қатар: %d):\n\t%s\n\n"
 
 	if helpPage != "" {

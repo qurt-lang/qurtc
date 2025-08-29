@@ -78,18 +78,18 @@ func (s *scanner) Tok() token.Token {
 
 func (s *scanner) Scan() bool {
 	ch, chw := s.nextCh()
-	if ch == '\n' && s.tok != token.SEMICOLON {
-		s.lit = "newline"
-		s.tok = token.SEMICOLON
-		return true
-	}
 	for unicode.IsSpace(ch) {
 		ch, chw = s.nextCh()
 	}
+
 	if unicode.IsLetter(ch) {
 		s.back(chw)
 		s.ident()
 		return true
+	}
+	if unicode.IsDigit(ch) {
+		s.back(chw)
+		s.numberLit()
 	}
 
 	switch ch {
@@ -97,8 +97,6 @@ func (s *scanner) Scan() bool {
 		s.lit = token.EOF.String()
 		s.tok = token.EOF
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-		s.back(chw)
-		s.numberLit()
 	case '"':
 		s.back(chw)
 		s.stringLit()

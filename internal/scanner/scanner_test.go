@@ -71,7 +71,7 @@ var tests []scannerTest = []scannerTest{
 	},
 
 	{
-		name:  "Recognize newlines as semicolons",
+		name:  "Newlines treated as whitespace",
 		input: "егер(x==5){\nқайтар 10\n}\n",
 		tokens: []scannerTestCase{
 			{token.IF, "егер"},
@@ -81,22 +81,9 @@ var tests []scannerTest = []scannerTest{
 			{token.INT, "5"},
 			{token.RPAREN, ")"},
 			{token.LBRACE, "{"},
-			{token.SEMICOLON, "newline"},
 			{token.RETURN, "қайтар"},
 			{token.INT, "10"},
-			{token.SEMICOLON, "newline"},
 			{token.RBRACE, "}"},
-			{token.SEMICOLON, "newline"},
-			{token.EOF, "EOF"},
-		},
-	},
-	{
-		name:  "Multiple consecutive newlines",
-		input: "x\n\n\ny",
-		tokens: []scannerTestCase{
-			{token.IDENT, "x"},
-			{token.SEMICOLON, "newline"},
-			{token.IDENT, "y"},
 			{token.EOF, "EOF"},
 		},
 	},
@@ -105,9 +92,7 @@ var tests []scannerTest = []scannerTest{
 		input: "x\ny\nz\t",
 		tokens: []scannerTestCase{
 			{token.IDENT, "x"},
-			{token.SEMICOLON, "newline"},
 			{token.IDENT, "y"},
-			{token.SEMICOLON, "newline"},
 			{token.IDENT, "z"},
 			{token.EOF, "EOF"},
 		},
@@ -266,11 +251,11 @@ var tests []scannerTest = []scannerTest{
 		input: "функция factorial(n) {\nегер (n <= 1) {\nқайтар 1;\n} әйтпесе {\nқайтар n * factorial(n - 1);}}",
 		tokens: []scannerTestCase{
 			{token.FUNC, "функция"}, {token.IDENT, "factorial"}, {token.LPAREN, "("},
-			{token.IDENT, "n"}, {token.RPAREN, ")"}, {token.LBRACE, "{"}, {token.SEMICOLON, "newline"},
+			{token.IDENT, "n"}, {token.RPAREN, ")"}, {token.LBRACE, "{"},
 			{token.IF, "егер"}, {token.LPAREN, "("}, {token.IDENT, "n"}, {token.LEQ, "<="},
-			{token.INT, "1"}, {token.RPAREN, ")"}, {token.LBRACE, "{"}, {token.SEMICOLON, "newline"},
+			{token.INT, "1"}, {token.RPAREN, ")"}, {token.LBRACE, "{"},
 			{token.RETURN, "қайтар"}, {token.INT, "1"}, {token.SEMICOLON, "semicolon"},
-			{token.RBRACE, "}"}, {token.ELSE, "әйтпесе"}, {token.LBRACE, "{"}, {token.SEMICOLON, "newline"},
+			{token.RBRACE, "}"}, {token.ELSE, "әйтпесе"}, {token.LBRACE, "{"},
 			{token.RETURN, "қайтар"}, {token.IDENT, "n"}, {token.MUL, "*"}, {token.IDENT, "factorial"},
 			{token.LPAREN, "("}, {token.IDENT, "n"}, {token.SUB, "-"}, {token.INT, "1"},
 			{token.RPAREN, ")"}, {token.SEMICOLON, "semicolon"},
@@ -282,9 +267,9 @@ var tests []scannerTest = []scannerTest{
 		name:  "Struct definition",
 		input: "құрылым Point {\nx: INT,\ny: INT\n}",
 		tokens: []scannerTestCase{
-			{token.STRUCT, "құрылым"}, {token.IDENT, "Point"}, {token.LBRACE, "{"}, {token.SEMICOLON, "newline"},
-			{token.IDENT, "x"}, {token.COLON, ":"}, {token.IDENT, "INT"}, {token.COMMA, ","}, {token.SEMICOLON, "newline"},
-			{token.IDENT, "y"}, {token.COLON, ":"}, {token.IDENT, "INT"}, {token.SEMICOLON, "newline"},
+			{token.STRUCT, "құрылым"}, {token.IDENT, "Point"}, {token.LBRACE, "{"},
+			{token.IDENT, "x"}, {token.COLON, ":"}, {token.IDENT, "INT"}, {token.COMMA, ","},
+			{token.IDENT, "y"}, {token.COLON, ":"}, {token.IDENT, "INT"},
 			{token.RBRACE, "}"},
 			{token.EOF, "EOF"},
 		},
@@ -293,7 +278,7 @@ var tests []scannerTest = []scannerTest{
 		name:  "Loop with break and continue",
 		input: "қайтала {\nегер (x == 0) тоқта;\nегер (x % 2 == 0) өткіз;\nx = x - 1;\n}",
 		tokens: []scannerTestCase{
-			{token.FOR, "қайтала"}, {token.LBRACE, "{"}, {token.SEMICOLON, "newline"},
+			{token.FOR, "қайтала"}, {token.LBRACE, "{"},
 			{token.IF, "егер"}, {token.LPAREN, "("}, {token.IDENT, "x"}, {token.EQL, "=="},
 			{token.INT, "0"}, {token.RPAREN, ")"}, {token.BREAK, "тоқта"}, {token.SEMICOLON, "semicolon"},
 			{token.IF, "егер"}, {token.LPAREN, "("}, {token.IDENT, "x"}, {token.MOD, "%"},

@@ -70,7 +70,7 @@ var tokens = [...]string{
 	IDENT:  "АТАУ",
 	INT:    "БҮТІН",
 	FLOAT:  "БӨЛШЕК",
-	STRING: "МӘТІН",
+	STRING: "ЖОЛ",
 
 	ADD: "+",
 	SUB: "-",
