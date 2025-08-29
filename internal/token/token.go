@@ -64,7 +64,6 @@ const (
 
 var tokens = [...]string{
 	ILLEGAL: "ҚАТЕ",
-
 	EOF: "EOF",
 
 	IDENT:  "АТАУ",

@@ -269,7 +269,6 @@ func (s *scanner) stringLit() {
 	lit := ""
 	for {
 		ch, _ := s.nextCh()
-
 		if ch == '"' {
 			break
 		} else if ch == '\\' {
