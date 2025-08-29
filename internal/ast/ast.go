@@ -27,15 +27,15 @@ type (
 
 	VarDecl struct {
 		Name *NameExpr
-		Type Type
+		Type *Type
 		Val  Expr
 		decl
 	}
 
 	FuncDecl struct {
 		Name       *NameExpr
-		Args       []Type
-		ReturnType Type
+		Args       []*FuncArg
+		ReturnType *Type
 		Body       []Stmt
 		decl
 	}
@@ -106,9 +106,14 @@ type (
 		expr
 	}
 
+	FuncArg struct {
+		Name string
+		Type *Type
+	}
+
 	Field struct {
 		Name string
-		Type Type
+		Type *Type
 	}
 )
 
@@ -187,6 +192,7 @@ type Kind int
 
 const (
 	Unknown Kind = iota
+	TVoid
 	TStruct
 	TInt
 	TFloat

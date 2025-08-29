@@ -20,26 +20,22 @@ func New(filename string, input []byte) *parser {
 }
 
 func (p *parser) Parse() (decls []ast.Decl, err error) {
-Loop:
 	for p.s.Scan() {
 		switch p.s.Tok() {
 		case token.FUNC:
 			decls, err = p.appendDecl(decls, p.funcDecl)
 			if err != nil {
-				err = p.errorAt(errors.Join(err, ErrInvalidFuncDecl), help.FunctionsPage)
-				break Loop
+				return nil, p.errorAt(errors.Join(err, ErrInvalidFuncDecl), help.FunctionsPage)
 			}
 		case token.STRUCT:
 			decls, err = p.appendDecl(decls, p.structDecl)
 			if err != nil {
-				err = p.errorAt(errors.Join(err, ErrInvalidStructDecl), help.StructsPage)
-				break Loop
+				return nil, p.errorAt(errors.Join(err, ErrInvalidStructDecl), help.StructsPage)
 			}
 		case token.VAR:
 			decls, err = p.appendDecl(decls, p.varDecl)
 			if err != nil {
-				err = p.errorAt(errors.Join(err, ErrInvalidVarDecl), help.VarsPage)
-				break Loop
+				return nil, p.errorAt(errors.Join(err, ErrInvalidVarDecl), help.VarsPage)
 			}
 		default:
 			return nil, p.errorAt(ErrUnknownDecl, help.SyntaxPage)
@@ -47,8 +43,6 @@ Loop:
 	}
 	if p.s.Tok() == token.ILLEGAL {
 		return nil, p.errorAt(p.s.Err(), help.QurtTour)
-	} else if err != nil {
-		return nil, err
 	}
 	return decls, nil
 }
@@ -62,11 +56,126 @@ func (p *parser) appendDecl(decls []ast.Decl, fn func() (ast.Decl, error)) ([]as
 }
 
 func (p *parser) structDecl() (ast.Decl, error) {
-	return nil, nil
+	name, err := p.name()
+	if err != nil {
+		return nil, err
+	}
+	_, err = p.expect(token.LBRACK)
+	if err != nil {
+		return nil, err
+	}
+
+	var fields []*ast.Field
+	for {
+		_, tok, err := p.peekNext()
+		if err != nil {
+			return nil, err
+		} else if tok == token.RBRACE {
+			break
+		}
+
+		fieldName, err := p.name()
+		if err != nil {
+			return nil, err
+		}
+		fieldType, err := p.typ()
+		if err != nil {
+			return nil, err
+		}
+		_, err = p.expect(token.SEMICOLON)
+		if err != nil {
+			return nil, err
+		}
+		fields = append(fields, &ast.Field{
+			Name: fieldName.Value,
+			Type: fieldType,
+		})
+	}
+	_, err = p.expect(token.RBRACK)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ast.StructDecl{
+		Name:   name,
+		Fields: fields,
+	}, nil
 }
 
 func (p *parser) funcDecl() (ast.Decl, error) {
-	return nil, nil
+	name, err := p.name()
+	if err != nil {
+		return nil, err
+	}
+	_, err = p.expect(token.LPAREN)
+	if err != nil {
+		return nil, err
+	}
+
+	var args []*ast.FuncArg
+	for {
+		_, tok, err := p.peekNext()
+		if err != nil {
+			return nil, err
+		} else if tok == token.RPAREN {
+			break
+		}
+
+		argName, err := p.name()
+		if err != nil {
+			return nil, err
+		}
+		argType, err := p.typ()
+		if err != nil {
+			return nil, err
+		}
+		_, err = p.expect(token.COMMA)
+		if err != nil {
+			return nil, err
+		}
+		args = append(args, &ast.FuncArg{
+			Name: argName.Value,
+			Type: argType,
+		})
+	}
+	_, err = p.expect(token.RPAREN)
+	if err != nil {
+		return nil, err
+	}
+
+	returnType, err := p.typ()
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = p.expect(token.LBRACE)
+	if err != nil {
+		return nil, err
+	}
+	var body []ast.Stmt
+	for {
+		_, tok, err := p.peekNext()
+		if err != nil {
+			return nil, err
+		} else if tok == token.RBRACE {
+			break
+		}
+		stmt, err := p.stmt()
+		if err != nil {
+			return nil, err
+		}
+		body = append(body, stmt)
+	}
+	_, err = p.expect(token.RBRACE)
+	if err != nil {
+		return nil, err
+	}
+	return &ast.FuncDecl{
+		Name:       name,
+		Args:       args,
+		ReturnType: returnType,
+		Body:       body,
+	}, nil
 }
 
 func (p *parser) varDecl() (ast.Decl, error) {
@@ -95,7 +204,9 @@ func (p *parser) varDecl() (ast.Decl, error) {
 
 func (p *parser) expr() (ast.Expr, error)
 
-func (p *parser) typ() (ast.Type, error)
+func (p *parser) typ() (*ast.Type, error)
+
+func (p *parser) stmt() (ast.Stmt, error)
 
 func (p *parser) name() (*ast.NameExpr, error) {
 	lit, err := p.expect(token.IDENT)
@@ -112,4 +223,12 @@ func (p *parser) expect(tok token.Token) (string, error) {
 		return "", ErrUnexpectedToken
 	}
 	return p.s.Lit(), nil
+}
+
+func (p *parser) peekNext() (string, token.Token, error) {
+	if !p.s.Scan() {
+		return "", 0, p.s.Err()
+	}
+	p.s.Back()
+	return p.s.Lit(), p.s.Tok(), nil
 }

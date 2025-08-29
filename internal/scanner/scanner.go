@@ -9,6 +9,7 @@ import (
 
 type Scanner interface {
 	Scan() bool
+	Back()
 	Lit() string
 	Tok() token.Token
 	Pos() Pos
@@ -24,6 +25,7 @@ type scanner struct {
 	col      int
 	tok      token.Token
 	lit      string
+	chw      int
 }
 
 func New(filename string, src []byte) Scanner {
@@ -201,12 +203,17 @@ func (s *scanner) nextCh() (rune, int) {
 	r, size := utf8.DecodeRune(s.src[s.cursor:])
 	if r != utf8.RuneError {
 		s.cursor += size
+		s.chw = size
 		return r, size
 	}
 	if size == 0 {
 		return -1, 0
 	}
 	return utf8.RuneError, 0
+}
+
+func (s *scanner) Back() {
+	s.cursor -= s.chw
 }
 
 func (s *scanner) back(chw int) {
