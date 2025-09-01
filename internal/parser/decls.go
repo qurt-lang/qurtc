@@ -117,7 +117,7 @@ func (p *parser) structDecl() (ast.Decl, error) {
 			Type: fieldType,
 		})
 	}
-	_, err = p.expect(token.RBRACK)
+	_, err = p.expect(token.RBRACE)
 	if err != nil {
 		return nil, err
 	}
