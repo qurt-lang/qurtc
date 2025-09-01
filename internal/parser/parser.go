@@ -66,7 +66,7 @@ func (p *parser) name() (*ast.NameExpr, error) {
 }
 
 func (p *parser) typ() (*ast.Type, error) {
-	_, tok, err := p.peek()
+	tok, err := p.peek()
 	if err != nil {
 		return nil, err
 	}
@@ -108,10 +108,6 @@ func (p *parser) expect(tok token.Token) (string, error) {
 	return p.s.Lit(), nil
 }
 
-func (p *parser) peek() (string, token.Token, error) {
-	if !p.s.Scan() {
-		return "", 0, p.s.Err()
-	}
-	p.s.Back()
-	return p.s.Lit(), p.s.Tok(), nil
+func (p *parser) peek() (token.Token, error) {
+	return p.s.Peek()
 }

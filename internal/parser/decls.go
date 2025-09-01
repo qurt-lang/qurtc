@@ -17,7 +17,7 @@ func (p *parser) funcDecl() (ast.Decl, error) {
 
 	var args []*ast.FuncArg
 	for {
-		_, tok, err := p.peek()
+		tok, err := p.peek()
 		if err != nil {
 			return nil, err
 		} else if tok == token.RPAREN {
@@ -57,7 +57,7 @@ func (p *parser) funcDecl() (ast.Decl, error) {
 	}
 	var body []ast.Stmt
 	for {
-		_, tok, err := p.peek()
+		tok, err := p.peek()
 		if err != nil {
 			return nil, err
 		} else if tok == token.RBRACE {
@@ -93,7 +93,7 @@ func (p *parser) structDecl() (ast.Decl, error) {
 
 	var fields []*ast.Field
 	for {
-		_, tok, err := p.peek()
+		tok, err := p.peek()
 		if err != nil {
 			return nil, err
 		} else if tok == token.RBRACE {

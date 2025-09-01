@@ -84,7 +84,7 @@ type (
 
 	CallExpr struct {
 		Func    *NameExpr
-		ArgList []Expr
+		Args []Expr
 		expr
 	}
 
@@ -133,8 +133,8 @@ type (
 	}
 
 	AssignStmt struct {
-		Lhs *NameExpr
-		Rhs Expr
+		Var *NameExpr
+		Val Expr
 		stmt
 	}
 

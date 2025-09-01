@@ -9,7 +9,7 @@ import (
 
 type Scanner interface {
 	Scan() bool
-	Back()
+	Peek() (token.Token, error)
 	Lit() string
 	Tok() token.Token
 	Pos() Pos
@@ -210,8 +210,15 @@ func (s *scanner) nextCh() (rune, int) {
 	return utf8.RuneError, 0
 }
 
-func (s *scanner) Back() {
-	s.cursor -= s.chw
+func (s *scanner) Peek() (token.Token, error) {
+	tok := s.tok
+	if !s.Scan() {
+		return 0, s.Err()
+	}
+	nextTok := s.tok
+	s.back(s.chw)
+	s.tok = tok
+	return nextTok, nil
 }
 
 func (s *scanner) back(chw int) {
