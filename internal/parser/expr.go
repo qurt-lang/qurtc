@@ -5,7 +5,9 @@ import (
 	"github.com/nurtai325/qurtc/internal/token"
 )
 
-func (p *parser) expr() (ast.Expr, error)
+func (p *parser) expr() (ast.Expr, error) {
+	return nil, nil
+}
 
 func (p *parser) callExpr(name *ast.NameExpr) (*ast.CallExpr, error) {
 	if _, err := p.expect(token.LPAREN); err != nil {

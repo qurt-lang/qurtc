@@ -32,6 +32,7 @@ const (
 	NEQ // !=
 	LEQ // <=
 	GEQ // >=
+	operator_end
 
 	LPAREN // (
 	LBRACK // [
@@ -44,7 +45,6 @@ const (
 	RBRACE    // }
 	COLON     // :
 	SEMICOLON // ;
-	operator_end
 
 	keyword_beg
 	BREAK    // тоқта
@@ -64,7 +64,7 @@ const (
 
 var tokens = [...]string{
 	ILLEGAL: "ҚАТЕ",
-	EOF: "EOF",
+	EOF:     "EOF",
 
 	IDENT:  "АТАУ",
 	INT:    "БҮТІН",
@@ -142,26 +142,3 @@ func (t Token) IsLiteral() bool { return literal_beg < t && t < literal_end }
 func (t Token) IsOperator() bool { return operator_beg < t && t < operator_end }
 
 func (t Token) IsKeyword() bool { return keyword_beg < t && t < keyword_end }
-
-type Operator int
-
-const (
-	_ Operator = iota
-
-	Add // +
-	Sub // -
-	Mul // *
-	Mod // %
-
-	AndAnd // &&
-	OrOr   // ||
-
-	Eql // ==
-	Lss // <
-	Gtr // >
-	Not // !
-
-	Neq // !=
-	Leq // <=
-	Geq // >=
-)

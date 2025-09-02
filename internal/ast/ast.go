@@ -28,7 +28,7 @@ type (
 	VarDecl struct {
 		Name *NameExpr
 		Type *Type
-		Val  Expr
+		Val  Expr // if val is nil then zero value used
 		decl
 	}
 
@@ -76,9 +76,15 @@ type (
 		expr
 	}
 
-	OperationExpr struct {
-		Op   token.Operator
+	BinaryExpr struct {
+		Op   token.Token
 		X, Y Expr
+		expr
+	}
+
+	UnaryExpr struct {
+		Op token.Token
+		X  Expr
 		expr
 	}
 

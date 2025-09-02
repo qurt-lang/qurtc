@@ -120,17 +120,32 @@ func (p *parser) varDecl() (ast.Decl, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, err = p.expect(token.ASSIGN)
+
+	tok, err := p.peek()
 	if err != nil {
 		return nil, err
 	}
-	val, err := p.expr()
-	if err != nil {
-		return nil, err
+	switch tok {
+	case token.SEMICOLON:
+		return &ast.VarDecl{
+			Name: name,
+			Type: typ,
+		}, nil
+	case token.ASSIGN:
+		_, err = p.expect(token.ASSIGN)
+		if err != nil {
+			return nil, err
+		}
+		val, err := p.expr()
+		if err != nil {
+			return nil, err
+		}
+		return &ast.VarDecl{
+			Name: name,
+			Type: typ,
+			Val:  val,
+		}, nil
+	default:
+		return nil, ErrUnexpectedToken
 	}
-	return &ast.VarDecl{
-		Name: name,
-		Type: typ,
-		Val:  val,
-	}, nil
 }
