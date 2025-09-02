@@ -36,7 +36,7 @@ type (
 		Name       *NameExpr
 		Args       []*FuncArg
 		ReturnType *Type
-		Body       []Stmt
+		Body       Stmts
 		decl
 	}
 )
@@ -83,7 +83,7 @@ type (
 	}
 
 	CallExpr struct {
-		Func    *NameExpr
+		Func *NameExpr
 		Args []Expr
 		expr
 	}
@@ -158,8 +158,8 @@ type (
 
 	IfStmt struct {
 		Cond Expr
-		Then []Stmt
-		Else Stmt // either nil, *IfStmt, or *BlockStmt
+		Then Stmts
+		Else Stmt // either nil, *IfStmt or Stmts
 		stmt
 	}
 
@@ -167,7 +167,12 @@ type (
 		Init *VarDecl
 		Cond Expr
 		Post Stmt
-		Body []Stmt
+		Body Stmts
+		stmt
+	}
+
+	VarDeclStmt struct {
+		VarDecl *VarDecl
 		stmt
 	}
 )
@@ -178,14 +183,20 @@ type stmt struct {
 
 func (*stmt) aStmt() {}
 
+type Stmts []Stmt
+
+func (Stmts) aStmt() {}
+
+func (Stmts) aNode() {}
+
 // Types
 // ----------------------------------------------------------------------------
 
 type Type struct {
-	Kind    Kind
-	Name    *NameExpr
-	IsArray bool
-	ArrayLen  int
+	Kind     Kind
+	Name     *NameExpr
+	IsArray  bool
+	ArrayLen int
 }
 
 type Kind int

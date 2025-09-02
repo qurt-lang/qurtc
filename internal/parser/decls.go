@@ -51,28 +51,11 @@ func (p *parser) funcDecl() (ast.Decl, error) {
 		return nil, err
 	}
 
-	_, err = p.expect(token.LBRACE)
+	body, err := p.block()
 	if err != nil {
 		return nil, err
 	}
-	var body []ast.Stmt
-	for {
-		tok, err := p.peek()
-		if err != nil {
-			return nil, err
-		} else if tok == token.RBRACE {
-			break
-		}
-		stmt, err := p.stmt()
-		if err != nil {
-			return nil, err
-		}
-		body = append(body, stmt)
-	}
-	_, err = p.expect(token.RBRACE)
-	if err != nil {
-		return nil, err
-	}
+
 	return &ast.FuncDecl{
 		Name:       name,
 		Args:       args,
