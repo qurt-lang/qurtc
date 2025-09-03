@@ -76,6 +76,11 @@ type (
 		expr
 	}
 
+	BoolLitExpr struct {
+		Value bool
+		expr
+	}
+
 	BinaryExpr struct {
 		Op   token.Token
 		X, Y Expr
@@ -95,7 +100,7 @@ type (
 	}
 
 	SelectorExpr struct {
-		Struct *NameExpr
+		Struct Expr
 		Field  *Field
 		expr
 	}
@@ -107,8 +112,8 @@ type (
 	}
 
 	ArrayAccessExpr struct {
-		Array *NameExpr
-		Index *Expr
+		Array Expr
+		Index Expr
 		expr
 	}
 

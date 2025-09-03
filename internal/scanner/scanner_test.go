@@ -21,14 +21,14 @@ type scannerTest struct {
 
 var tests []scannerTest = []scannerTest{
 	{
-		name:  "Empty input",
+		name:  "empty input",
 		input: "",
 		tokens: []scannerTestCase{
 			{token.EOF, "EOF"},
 		},
 	},
 	{
-		name:  "Whitespace only",
+		name:  "whitespace only",
 		input: "   \t\t\n  ",
 		tokens: []scannerTestCase{
 			{token.EOF, "EOF"},
@@ -36,18 +36,20 @@ var tests []scannerTest = []scannerTest{
 	},
 
 	{
-		name:  "Test IsLiteral method",
-		input: "x 123 45.67 \"text\"",
+		name:  "test IsLiteral method",
+		input: "x 123 45.67 \"text\" иә жоқ",
 		tokens: []scannerTestCase{
 			{token.IDENT, "x"},
 			{token.INT, "123"},
 			{token.FLOAT, "45.67"},
 			{token.STRING, "text"},
+			{token.TRUE, "иә"},
+			{token.FALSE, "жоқ"},
 			{token.EOF, "EOF"},
 		},
 	},
 	{
-		name:  "Test IsOperator method",
+		name:  "test IsOperator method",
 		input: "+ - * / % && || == != <= >= < > ! = ( ) [ ] { } , . : ;",
 		tokens: []scannerTestCase{
 			{token.ADD, "+"}, {token.SUB, "-"}, {token.MUL, "*"}, {token.DIV, "/"}, {token.MOD, "%"},
@@ -60,18 +62,49 @@ var tests []scannerTest = []scannerTest{
 		},
 	},
 	{
-		name:  "Test IsKeyword method",
-		input: "тоқта өткіз әйтпесе қайтала функция егер қайтар құрылым айнымалы",
+		name:  "test IsKeyword method",
+		input: "тоқта өткіз әйтпесе қайтала функция егер қайтар құрылым айнымалы иә жоқ",
 		tokens: []scannerTestCase{
 			{token.BREAK, "тоқта"}, {token.CONTINUE, "өткіз"}, {token.ELSE, "әйтпесе"},
 			{token.FOR, "қайтала"}, {token.FUNC, "функция"}, {token.IF, "егер"},
 			{token.RETURN, "қайтар"}, {token.STRUCT, "құрылым"}, {token.VAR, "айнымалы"},
+			{token.TRUE, "иә"}, {token.FALSE, "жоқ"},
 			{token.EOF, "EOF"},
 		},
 	},
 
 	{
-		name:  "Newlines treated as whitespace",
+		name:  "boolean literals test",
+		input: "иә жоқ иәFalse жоқTrue иәжоқ",
+		tokens: []scannerTestCase{
+			{token.TRUE, "иә"},
+			{token.FALSE, "жоқ"},
+			{token.IDENT, "иәFalse"},
+			{token.IDENT, "жоқTrue"},
+			{token.IDENT, "иәжоқ"},
+			{token.EOF, "EOF"},
+		},
+	},
+
+	{
+		name:  "boolean in expressions",
+		input: "егер (иә && жоқ) қайтар иә;",
+		tokens: []scannerTestCase{
+			{token.IF, "егер"},
+			{token.LPAREN, "("},
+			{token.TRUE, "иә"},
+			{token.LAND, "&&"},
+			{token.FALSE, "жоқ"},
+			{token.RPAREN, ")"},
+			{token.RETURN, "қайтар"},
+			{token.TRUE, "иә"},
+			{token.SEMICOLON, "semicolon"},
+			{token.EOF, "EOF"},
+		},
+	},
+
+	{
+		name:  "newlines treated as whitespace",
 		input: "егер(x==5){\nқайтар 10\n}\n",
 		tokens: []scannerTestCase{
 			{token.IF, "егер"},
@@ -88,7 +121,7 @@ var tests []scannerTest = []scannerTest{
 		},
 	},
 	{
-		name:  "Mixed line endings",
+		name:  "mixed line endings",
 		input: "x\ny\nz\t",
 		tokens: []scannerTestCase{
 			{token.IDENT, "x"},
@@ -99,7 +132,7 @@ var tests []scannerTest = []scannerTest{
 	},
 
 	{
-		name:  "Integer edge cases",
+		name:  "integer edge cases",
 		input: "0 00 123 1000000000000000000000",
 		tokens: []scannerTestCase{
 			{token.INT, "0"},
@@ -110,7 +143,7 @@ var tests []scannerTest = []scannerTest{
 		},
 	},
 	{
-		name:  "Float edge cases",
+		name:  "float edge cases",
 		input: "0.0 .5 123. 0.123 999.999",
 		tokens: []scannerTestCase{
 			{token.FLOAT, "0.0"},
@@ -123,7 +156,7 @@ var tests []scannerTest = []scannerTest{
 		},
 	},
 	{
-		name:  "Malformed float variations",
+		name:  "malformed float variations",
 		input: "12..45 123...456 .",
 		tokens: []scannerTestCase{
 			{token.FLOAT, "12."},
@@ -138,7 +171,7 @@ var tests []scannerTest = []scannerTest{
 		},
 	},
 	{
-		name:  "Numbers followed by identifiers",
+		name:  "numbers followed by identifiers",
 		input: "123abc 45.67def 0x123",
 		tokens: []scannerTestCase{
 			{token.INT, "123"},
@@ -152,7 +185,7 @@ var tests []scannerTest = []scannerTest{
 	},
 
 	{
-		name:  "String variations",
+		name:  "string variations",
 		input: "\"hello\" \"\" \"қазақша мәтін\" \"with spaces\"",
 		tokens: []scannerTestCase{
 			{token.STRING, "hello"},
@@ -164,7 +197,7 @@ var tests []scannerTest = []scannerTest{
 	},
 
 	{
-		name:  "String with escape sequences",
+		name:  "string with escape sequences",
 		input: "\"line1\nline2\" \"tab\there\" \"quote\\\"inside\"",
 		tokens: []scannerTestCase{
 			{token.STRING, "line1\nline2"},
@@ -175,7 +208,7 @@ var tests []scannerTest = []scannerTest{
 	},
 
 	{
-		name:  "String with newlines",
+		name:  "string with newlines",
 		input: "\"line1\nline2\"",
 		tokens: []scannerTestCase{
 			{token.STRING, "line1\nline2"},
@@ -184,7 +217,7 @@ var tests []scannerTest = []scannerTest{
 	},
 
 	{
-		name:  "Unicode identifiers",
+		name:  "unicode identifiers",
 		input: "айнымалы сөзҰзын123 mixedАБВ кириллица",
 		tokens: []scannerTestCase{
 			{token.VAR, "айнымалы"},
@@ -195,19 +228,21 @@ var tests []scannerTest = []scannerTest{
 		},
 	},
 	{
-		name:  "Keywords vs identifiers",
-		input: "егер егерсіз функцияFoo тоқтаBar",
+		name:  "keywords vs identifiers",
+		input: "егер егерсіз функцияFoo тоқтаBar иәFalse жоқTrue",
 		tokens: []scannerTestCase{
 			{token.IF, "егер"},
 			{token.IDENT, "егерсіз"},
 			{token.IDENT, "функцияFoo"},
 			{token.IDENT, "тоқтаBar"},
+			{token.IDENT, "иәFalse"},
+			{token.IDENT, "жоқTrue"},
 			{token.EOF, "EOF"},
 		},
 	},
 
 	{
-		name:  "Operator precedence order",
+		name:  "operator precedence order",
 		input: "!x&&y||z==w!=v<=u>=t<s>r",
 		tokens: []scannerTestCase{
 			{token.NOT, "!"}, {token.IDENT, "x"}, {token.LAND, "&&"}, {token.IDENT, "y"},
@@ -219,7 +254,7 @@ var tests []scannerTest = []scannerTest{
 		},
 	},
 	{
-		name:  "Ambiguous operator sequences",
+		name:  "ambiguous operator sequences",
 		input: "<= >= == != ! = < > && || & ",
 		tokens: []scannerTestCase{
 			{token.LEQ, "<="}, {token.GEQ, ">="}, {token.EQL, "=="}, {token.NEQ, "!="},
@@ -230,14 +265,14 @@ var tests []scannerTest = []scannerTest{
 	},
 
 	{
-		name:  "Single illegal character",
+		name:  "single illegal character",
 		input: `#`,
 		tokens: []scannerTestCase{
 			{token.ILLEGAL, "ҚАТЕ"},
 		},
 	},
 	{
-		name:  "Valid token followed by illegal character",
+		name:  "valid token followed by illegal character",
 		input: `айнымалы @`,
 		tokens: []scannerTestCase{
 			{token.VAR, "айнымалы"},
@@ -247,7 +282,7 @@ var tests []scannerTest = []scannerTest{
 	},
 
 	{
-		name:  "Function definition with complex body",
+		name:  "function definition with complex body",
 		input: "функция factorial(n) {\nегер (n <= 1) {\nқайтар 1;\n} әйтпесе {\nқайтар n * factorial(n - 1);}}",
 		tokens: []scannerTestCase{
 			{token.FUNC, "функция"}, {token.IDENT, "factorial"}, {token.LPAREN, "("},
@@ -264,7 +299,7 @@ var tests []scannerTest = []scannerTest{
 		},
 	},
 	{
-		name:  "Struct definition",
+		name:  "struct definition",
 		input: "құрылым Point {\nx: INT,\ny: INT\n}",
 		tokens: []scannerTestCase{
 			{token.STRUCT, "құрылым"}, {token.IDENT, "Point"}, {token.LBRACE, "{"},
@@ -275,7 +310,7 @@ var tests []scannerTest = []scannerTest{
 		},
 	},
 	{
-		name:  "Loop with break and continue",
+		name:  "loop with break and continue",
 		input: "қайтала {\nегер (x == 0) тоқта;\nегер (x % 2 == 0) өткіз;\nx = x - 1;\n}",
 		tokens: []scannerTestCase{
 			{token.FOR, "қайтала"}, {token.LBRACE, "{"},
@@ -291,7 +326,19 @@ var tests []scannerTest = []scannerTest{
 	},
 
 	{
-		name:  "Very long identifier",
+		name:  "boolean logic with conditions",
+		input: "айнымалы isValid = иә; егер (!isValid || x == жоқ) қайтар жоқ;",
+		tokens: []scannerTestCase{
+			{token.VAR, "айнымалы"}, {token.IDENT, "isValid"}, {token.ASSIGN, "="}, {token.TRUE, "иә"}, {token.SEMICOLON, "semicolon"},
+			{token.IF, "егер"}, {token.LPAREN, "("}, {token.NOT, "!"}, {token.IDENT, "isValid"},
+			{token.LOR, "||"}, {token.IDENT, "x"}, {token.EQL, "=="}, {token.FALSE, "жоқ"}, {token.RPAREN, ")"},
+			{token.RETURN, "қайтар"}, {token.FALSE, "жоқ"}, {token.SEMICOLON, "semicolon"},
+			{token.EOF, "EOF"},
+		},
+	},
+
+	{
+		name:  "very long identifier",
 		input: strings.Repeat("а", 1000),
 		tokens: []scannerTestCase{
 			{token.IDENT, strings.Repeat("а", 1000)},
@@ -299,7 +346,7 @@ var tests []scannerTest = []scannerTest{
 		},
 	},
 	{
-		name:  "Very long number",
+		name:  "very long number",
 		input: strings.Repeat("9", 1000),
 		tokens: []scannerTestCase{
 			{token.INT, strings.Repeat("9", 1000)},

@@ -236,13 +236,26 @@ func (s *scanner) ident() {
 		s.back(chw)
 		break
 	}
+
+	if lit == token.TRUE.String() {
+		s.lit = token.TRUE.String()
+		s.tok = token.TRUE
+		return
+	} else if lit == token.FALSE.String() {
+		s.lit = token.FALSE.String()
+		s.tok = token.FALSE
+		return
+	}
+
 	tok, ok := token.Lookup(lit)
 	if ok {
 		s.lit = lit
 		s.tok = tok
+		return
 	} else {
 		s.lit = lit
 		s.tok = token.IDENT
+		return
 	}
 }
 

@@ -11,6 +11,8 @@ const (
 	INT    // 12345
 	FLOAT  // 123.45
 	STRING // "abc"
+	TRUE   // иә
+	FALSE  // жоқ
 	literal_end
 
 	operator_beg
@@ -70,6 +72,8 @@ var tokens = [...]string{
 	INT:    "БҮТІН",
 	FLOAT:  "БӨЛШЕК",
 	STRING: "ЖОЛ",
+	TRUE:   "иә",
+	FALSE:  "жоқ",
 
 	ADD: "+",
 	SUB: "-",
