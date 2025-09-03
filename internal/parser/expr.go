@@ -201,6 +201,27 @@ func (p *parser) callExpr(name *ast.NameExpr) (*ast.CallExpr, error) {
 		return nil, err
 	}
 	var args []ast.Expr
+	tok, err := p.peek()
+	if err != nil {
+		return nil, err
+	}
+	if tok != token.RPAREN {
+		args, err = p.argList()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if _, err := p.expect(token.RPAREN); err != nil {
+		return nil, err
+	}
+	return &ast.CallExpr{
+		Func: name,
+		Args: args,
+	}, nil
+}
+
+func (p *parser) argList() ([]ast.Expr, error) {
+	var args []ast.Expr
 	for {
 		arg, err := p.expr()
 		if err != nil {
@@ -212,19 +233,12 @@ func (p *parser) callExpr(name *ast.NameExpr) (*ast.CallExpr, error) {
 		if err != nil {
 			return nil, err
 		}
-		if tok == token.COMMA {
-			p.expect(token.COMMA)
-			continue
+		if tok != token.COMMA {
+			break
 		}
-		break
+		p.expect(token.COMMA)
 	}
-	if _, err := p.expect(token.RPAREN); err != nil {
-		return nil, err
-	}
-	return &ast.CallExpr{
-		Func: name,
-		Args: args,
-	}, nil
+	return args, nil
 }
 
 func (p *parser) selectorExpr(structExpr ast.Expr) (ast.Expr, error) {

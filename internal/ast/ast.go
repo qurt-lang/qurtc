@@ -89,7 +89,7 @@ type (
 
 	CallExpr struct {
 		Func *NameExpr
-		Args []Expr
+		Args []Expr // if nil then no args
 		expr
 	}
 
