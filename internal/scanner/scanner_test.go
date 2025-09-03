@@ -50,14 +50,14 @@ var tests []scannerTest = []scannerTest{
 	},
 	{
 		name:  "test IsOperator method",
-		input: "+ - * / % && || == != <= >= < > ! = ( ) [ ] { } , . : ;",
+		input: "+ - * / % && || == != <= >= < > ! = ( ) [ ] { } , . ;",
 		tokens: []scannerTestCase{
 			{token.ADD, "+"}, {token.SUB, "-"}, {token.MUL, "*"}, {token.DIV, "/"}, {token.MOD, "%"},
 			{token.LAND, "&&"}, {token.LOR, "||"}, {token.EQL, "=="}, {token.NEQ, "!="},
 			{token.LEQ, "<="}, {token.GEQ, ">="}, {token.LSS, "<"}, {token.GTR, ">"},
 			{token.NOT, "!"}, {token.ASSIGN, "="}, {token.LPAREN, "("}, {token.RPAREN, ")"},
 			{token.LBRACK, "["}, {token.RBRACK, "]"}, {token.LBRACE, "{"}, {token.RBRACE, "}"},
-			{token.COMMA, ","}, {token.PERIOD, "."}, {token.COLON, ":"}, {token.SEMICOLON, "semicolon"},
+			{token.COMMA, ","}, {token.PERIOD, "."}, {token.SEMICOLON, "semicolon"},
 			{token.EOF, "EOF"},
 		},
 	},
@@ -300,11 +300,11 @@ var tests []scannerTest = []scannerTest{
 	},
 	{
 		name:  "struct definition",
-		input: "құрылым Point {\nx: INT,\ny: INT\n}",
+		input: "құрылым Point {\nx INT,\ny INT\n}",
 		tokens: []scannerTestCase{
 			{token.STRUCT, "құрылым"}, {token.IDENT, "Point"}, {token.LBRACE, "{"},
-			{token.IDENT, "x"}, {token.COLON, ":"}, {token.IDENT, "INT"}, {token.COMMA, ","},
-			{token.IDENT, "y"}, {token.COLON, ":"}, {token.IDENT, "INT"},
+			{token.IDENT, "x"}, {token.IDENT, "INT"}, {token.COMMA, ","},
+			{token.IDENT, "y"}, {token.IDENT, "INT"},
 			{token.RBRACE, "}"},
 			{token.EOF, "EOF"},
 		},

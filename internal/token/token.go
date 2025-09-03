@@ -45,7 +45,6 @@ const (
 	RPAREN    // )
 	RBRACK    // ]
 	RBRACE    // }
-	COLON     // :
 	SEMICOLON // ;
 
 	keyword_beg
@@ -103,7 +102,6 @@ var tokens = [...]string{
 	RPAREN:    ")",
 	RBRACK:    "]",
 	RBRACE:    "}",
-	COLON:     ":",
 	SEMICOLON: ";",
 
 	BREAK:    "тоқта",

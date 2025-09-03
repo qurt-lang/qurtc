@@ -177,8 +177,6 @@ func (s *scanner) Scan() bool {
 		s.lit, s.tok = token.RBRACK.String(), token.RBRACK
 	case '}':
 		s.lit, s.tok = token.RBRACE.String(), token.RBRACE
-	case ':':
-		s.lit, s.tok = token.COLON.String(), token.COLON
 	case ';':
 		s.lit, s.tok = "semicolon", token.SEMICOLON
 	default:
