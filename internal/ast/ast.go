@@ -67,29 +67,23 @@ type (
 	}
 
 	IntLitExpr struct {
-		Value int
+		Value string
 		expr
 	}
 
 	FloatLitExpr struct {
-		Value float32
+		Value string
 		expr
 	}
 
 	BoolLitExpr struct {
-		Value bool
+		Value string
 		expr
 	}
 
-	BinaryExpr struct {
+	OperationExpr struct {
 		Op   token.Token
 		X, Y Expr
-		expr
-	}
-
-	UnaryExpr struct {
-		Op token.Token
-		X  Expr
 		expr
 	}
 
@@ -102,12 +96,6 @@ type (
 	SelectorExpr struct {
 		Struct Expr
 		Field  *Field
-		expr
-	}
-
-	ArrayExpr struct {
-		Length   int
-		Elements []Expr
 		expr
 	}
 
