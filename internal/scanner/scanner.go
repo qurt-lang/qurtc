@@ -25,7 +25,7 @@ type scanner struct {
 	col      int
 	tok      token.Token
 	lit      string
-	chw      int
+	tokw     int
 }
 
 func New(filename string, src []byte) Scanner {
@@ -77,6 +77,7 @@ func (s *scanner) Tok() token.Token {
 }
 
 func (s *scanner) Scan() bool {
+	s.tokw = 0
 	ch, chw := s.nextCh()
 	for unicode.IsSpace(ch) {
 		ch, chw = s.nextCh()
@@ -90,13 +91,13 @@ func (s *scanner) Scan() bool {
 	if unicode.IsDigit(ch) {
 		s.back(chw)
 		s.numberLit()
+		return true
 	}
 
 	switch ch {
 	case -1:
 		s.lit = token.EOF.String()
 		s.tok = token.EOF
-	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 	case '"':
 		s.back(chw)
 		s.stringLit()
@@ -199,7 +200,7 @@ func (s *scanner) nextCh() (rune, int) {
 	r, size := utf8.DecodeRune(s.src[s.cursor:])
 	if r != utf8.RuneError {
 		s.cursor += size
-		s.chw = size
+		s.tokw += size
 		return r, size
 	}
 	if size == 0 {
@@ -209,18 +210,20 @@ func (s *scanner) nextCh() (rune, int) {
 }
 
 func (s *scanner) Peek() (token.Token, error) {
-	tok := s.tok
+	tok, lit := s.tok, s.lit
 	if !s.Scan() {
 		return 0, s.Err()
 	}
 	nextTok := s.tok
-	s.back(s.chw)
+	s.back(s.tokw)
 	s.tok = tok
+	s.lit = lit
 	return nextTok, nil
 }
 
 func (s *scanner) back(chw int) {
 	s.cursor -= chw
+	s.tokw -= chw
 }
 
 func (s *scanner) ident() {

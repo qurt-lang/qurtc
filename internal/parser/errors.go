@@ -19,7 +19,7 @@ var (
 
 func (p *parser) errorAt(err error, helpPage help.DocPage) error {
 	// TODO: add source context line
-	errTempl := "Синтаксис қатесі (файл: %s, жол: %d, қатар: %d):\n\t%s\n\n"
+	errTempl := "Синтаксис қатесі (файл: %s, жол: %d, қатар: %d): %s\n"
 
 	if helpPage != "" {
 		errTempl += fmt.Sprintf("Мына сілтеме сізге қатеңізді түзеуге көмектесуі мүмкін: %s\n", helpPage)
