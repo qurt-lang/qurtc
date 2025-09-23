@@ -123,10 +123,9 @@ func (t Token) String() string {
 	return tokens[t]
 }
 
-var keywords map[string]Token
+var keywords = make(map[string]Token, keyword_end-(keyword_beg+1))
 
 func init() {
-	keywords = make(map[string]Token, keyword_end-(keyword_beg+1))
 	for i := keyword_beg + 1; i < keyword_end; i++ {
 		keywords[tokens[i]] = i
 	}

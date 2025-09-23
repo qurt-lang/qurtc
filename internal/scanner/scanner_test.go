@@ -360,7 +360,9 @@ func TestScanner(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sc := scanner.New("test.құрт", []byte(tt.input))
 			for _, expected := range tt.tokens {
+				sc.Peek()
 				sc.Scan()
+				sc.Peek()
 				tok, lit := sc.Tok(), sc.Lit()
 				if tok != expected.tok || lit != expected.lit {
 					t.Errorf("%d.%s: got (%v, %s), want (%v, %s)",

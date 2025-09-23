@@ -32,7 +32,8 @@ func New(filename string, src []byte) Scanner {
 	s := scanner{
 		filename: filename,
 		// TODO: use io.Reader and buffer instead of []byte
-		src: src,
+		src:  src,
+		line: 1,
 	}
 	return &s
 }
@@ -43,29 +44,20 @@ type Pos interface {
 	Col() int
 }
 
-type pos struct {
-	filename  string
-	line, col int
+func (s *scanner) File() string {
+	return s.filename
 }
 
-func (p pos) File() string {
-	return p.filename
+func (s *scanner) Line() int {
+	return s.line
 }
 
-func (p pos) Line() int {
-	return p.line
-}
-
-func (p pos) Col() int {
-	return p.col
+func (s *scanner) Col() int {
+	return s.col
 }
 
 func (s *scanner) Pos() Pos {
-	return pos{
-		filename: s.filename,
-		line:     s.line,
-		col:      s.col,
-	}
+	return s
 }
 
 func (s *scanner) Lit() string {
@@ -196,9 +188,14 @@ func (s *scanner) nextCh() (rune, int) {
 	if s.cursor >= len(s.src) {
 		return -1, 0
 	}
-	s.col += 1
 	r, size := utf8.DecodeRune(s.src[s.cursor:])
 	if r != utf8.RuneError {
+		if r == '\n' {
+			s.line += 1
+			s.col = 0
+		} else {
+			s.col += 1
+		}
 		s.cursor += size
 		s.tokw += size
 		return r, size
@@ -211,19 +208,22 @@ func (s *scanner) nextCh() (rune, int) {
 
 func (s *scanner) Peek() (token.Token, error) {
 	tok, lit := s.tok, s.lit
-	if !s.Scan() {
-		return 0, s.Err()
-	}
+
+	s.Scan()
+
 	nextTok := s.tok
+
 	s.back(s.tokw)
 	s.tok = tok
 	s.lit = lit
-	return nextTok, nil
+
+	return nextTok, s.Err()
 }
 
-func (s *scanner) back(chw int) {
-	s.cursor -= chw
-	s.tokw -= chw
+func (s *scanner) back(tokw int) {
+	s.cursor -= tokw
+	s.tokw -= tokw
+	s.col -= tokw
 }
 
 func (s *scanner) ident() {

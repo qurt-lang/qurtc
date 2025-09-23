@@ -28,7 +28,7 @@ type (
 	VarDecl struct {
 		Name *NameExpr
 		Type *Type
-		Val  Expr // if val is nil then zero value used
+		Val  Expr
 		decl
 	}
 
@@ -212,6 +212,21 @@ func GetKind(typeName string) Kind {
 		return TString
 	default:
 		return TStruct
+	}
+}
+
+func (k Kind) String() string {
+	switch k {
+	case TVoid:
+		return types[TVoid]
+	case TInt:
+		return types[TInt]
+	case TFloat:
+		return types[TFloat]
+	case TString:
+		return types[TString]
+	default:
+		return token.STRUCT.String()
 	}
 }
 

@@ -27,5 +27,16 @@ func TestParser(t *testing.T) {
 		if err != nil {
 			t.Errorf("expected successfully parsed file %s, got err %v", entry.Name(), err)
 		}
+		// for _, decl := range decls {
+		// 	funcDecl := decl.(*ast.FuncDecl)
+		// 	fmt.Println(funcDecl.Name)
+		// 	for _, arg := range funcDecl.Args {
+		// 		fmt.Println("arg", arg.Name, arg.Type)
+		// 	}
+		// 	fmt.Println(funcDecl.ReturnType.Name)
+		// 	for _, stmt := range funcDecl.Body {
+		// 		fmt.Println(stmt)
+		// 	}
+		// }
 	}
 }
