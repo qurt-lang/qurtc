@@ -10,12 +10,21 @@ import (
 var (
 	ErrUnexpectedEOF = errors.New("файл күтпеген жерден аяқталады")
 
-	ErrUnknownDecl     = errors.New("функция сыртында тек жаңа айнымалы, функция, құрылым жариялауға ғана болады")
+	ErrUnknownDecl       = errors.New("функция сыртында тек жаңа айнымалы, функция, құрылым жариялауға ғана болады")
 	ErrInvalidFuncDecl   = errors.New("функция жариялаудың ережелері сақталмаған")
 	ErrInvalidStructDecl = errors.New("құрылым жариялаудың ережелері сақталмаған")
 	ErrInvalidVarDecl    = errors.New("айнымалы жариялаудың ережелері сақталмаған")
 
-	ErrInvalidIdent    = errors.New("функция, айнымалы, тип атаулары ережеге сай есім болуы керек")
+	ErrInvalidExpr = errors.New("ережеге сай емес өрнек")
+	ErrInvalidFuncCall = errors.New("функция шақыру ережесі сақталмаған")
+
+	ErrInvalidIdent  = errors.New("функция, айнымалы, тип атаулары ережеге сай есім болуы керек")
+	ErrInvalidArray  = errors.New("ережеге сай емес массив")
+	ErrInvalidString = errors.New("ережеге сай емес ЖОЛ")
+	ErrInvalidInt    = errors.New("ережеге сай емес БҮТІН")
+	ErrInvalidFloat  = errors.New("ережеге сай емес БӨЛШЕК")
+	ErrInvalidBool   = errors.New("ережеге сай емес ШЫН")
+
 	ErrInvalidArrayLen = errors.New("тізім ұзындығы тек БҮТІН сан ғана бола алады және [] арасында болу керек")
 	ErrInvalidTypeName = errors.New("айнымалы немесе функция аргументі типі ережеге сай есім болу керек")
 )

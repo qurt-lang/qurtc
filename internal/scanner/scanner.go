@@ -220,10 +220,10 @@ func (s *scanner) Peek() (token.Token, error) {
 	return nextTok, s.Err()
 }
 
-func (s *scanner) back(tokw int) {
-	s.cursor -= tokw
-	s.tokw -= tokw
-	s.col -= tokw
+func (s *scanner) back(n int) {
+	s.cursor -= n
+	s.tokw -= n
+	s.col -= n
 }
 
 func (s *scanner) ident() {

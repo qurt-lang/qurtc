@@ -1,6 +1,8 @@
 package ast
 
-import "github.com/nurtai325/qurtc/internal/token"
+import (
+	"github.com/nurtai325/qurtc/internal/token"
+)
 
 type Node interface {
 	aNode()
@@ -26,9 +28,7 @@ type (
 	}
 
 	VarDecl struct {
-		Name *NameExpr
-		Type *Type
-		Val  Expr
+		*VarStmt
 		decl
 	}
 
@@ -47,6 +47,16 @@ type decl struct {
 
 func (*decl) aDecl() {}
 
+type FuncArg struct {
+	Name string
+	Type *Type
+}
+
+type Field struct {
+	Name string
+	Type *Type
+}
+
 // Expressions
 // ----------------------------------------------------------------------------
 
@@ -61,29 +71,28 @@ type (
 		expr
 	}
 
-	StringLitExpr struct {
+	StringExpr struct {
 		Value string
 		expr
 	}
 
-	IntLitExpr struct {
-		Value string
+	IntExpr struct {
+		Value int
 		expr
 	}
 
-	FloatLitExpr struct {
-		Value string
+	FloatExpr struct {
+		Value float32
 		expr
 	}
 
-	BoolLitExpr struct {
-		Value string
+	BoolExpr struct {
+		Value bool
 		expr
 	}
 
-	OperationExpr struct {
-		Op   token.Token
-		X, Y Expr
+	ArrayExpr struct {
+		Elements []Expr
 		expr
 	}
 
@@ -94,25 +103,27 @@ type (
 	}
 
 	SelectorExpr struct {
-		Struct Expr
-		Field  *Field
+		Struct *SelectorExpr
+		Field  *NameExpr
 		expr
 	}
 
 	ArrayAccessExpr struct {
-		Array Expr
+		Array *NameExpr
 		Index Expr
 		expr
 	}
 
-	FuncArg struct {
-		Name string
-		Type *Type
+	UnaryOpExpr struct {
+		Op token.Token
+		X  Expr
+		expr
 	}
 
-	Field struct {
-		Name string
-		Type *Type
+	OpExpr struct {
+		Op   token.Token
+		X, Y Expr
+		expr
 	}
 )
 
@@ -170,8 +181,10 @@ type (
 		stmt
 	}
 
-	VarDeclStmt struct {
-		VarDecl *VarDecl
+	VarStmt struct {
+		Name *NameExpr
+		Type *Type
+		Val  Expr
 		stmt
 	}
 )
@@ -201,33 +214,19 @@ type Type struct {
 type Kind int
 
 func GetKind(typeName string) Kind {
-	switch typeName {
-	case types[TVoid]:
-		return TVoid
-	case types[TInt]:
-		return TInt
-	case types[TFloat]:
-		return TFloat
-	case types[TString]:
-		return TString
-	default:
-		return TStruct
+	for i, kindName := range types {
+		if typeName == kindName {
+			return Kind(i)
+		}
 	}
+	return TStruct
 }
 
 func (k Kind) String() string {
-	switch k {
-	case TVoid:
-		return types[TVoid]
-	case TInt:
-		return types[TInt]
-	case TFloat:
-		return types[TFloat]
-	case TString:
-		return types[TString]
-	default:
+	if int(k) >= len(types) {
 		return token.STRUCT.String()
 	}
+	return types[k]
 }
 
 const (
@@ -235,6 +234,7 @@ const (
 	TInt
 	TFloat
 	TString
+	TBool
 	TStruct
 )
 
@@ -243,4 +243,5 @@ var types = [...]string{
 	TInt:    "бүтін",
 	TFloat:  "бөлшек",
 	TString: "жол",
+	TBool:   "шын",
 }

@@ -12,13 +12,25 @@ import (
 )
 
 type parser struct {
-	s scanner.Scanner
+	s           scanner.Scanner
+	prefixFuncs map[token.Token]func() (ast.Expr, error)
+	infixFuncs  map[token.Token]func(left ast.Expr) (ast.Expr, error)
 }
 
 func New(filename string, input []byte) *parser {
-	return &parser{
+	newParser := &parser{
 		s: scanner.New(filename, []byte(input)),
 	}
+	newParser.prefixFuncs = map[token.Token]func() (ast.Expr, error){
+		token.IDENT:  newParser.nameExpr,
+		token.LBRACE: newParser.array,
+		token.STRING: newParser.string,
+		token.INT:    newParser.int,
+		token.FLOAT:  newParser.float,
+		token.TRUE:   newParser.bool,
+		token.FALSE:  newParser.bool,
+	}
+	return newParser
 }
 
 func (p *parser) Parse() (decls []ast.Decl, err error) {
@@ -87,15 +99,18 @@ func (p *parser) typ() (*ast.Type, error) {
 
 func (p *parser) arrlen() (int, error) {
 	p.expect(token.LBRACK)
-	if lit, err := p.expect(token.INT); err != nil {
+	lit, err := p.expect(token.INT)
+	if err != nil {
 		return 0, err
-	} else if _, err := p.expect(token.RBRACK); err != nil {
-		return 0, err
-	} else if arrayLen, err := strconv.ParseInt(lit, 10, 0); err != nil {
-		return 0, err
-	} else {
-		return int(arrayLen), nil
 	}
+	if _, err := p.expect(token.RBRACK); err != nil {
+		return 0, err
+	}
+	arrayLen, err := strconv.ParseInt(lit, 10, 0)
+	if err != nil {
+		return 0, err
+	}
+	return int(arrayLen), nil
 }
 
 func (p *parser) expect(tok token.Token) (string, error) {
@@ -112,7 +127,7 @@ func (p *parser) expect(tok token.Token) (string, error) {
 }
 
 func (p *parser) peek() (token.Token, error) {
-	tok, err :=  p.s.Peek()
+	tok, err := p.s.Peek()
 	if tok == token.EOF {
 		return token.EOF, ErrUnexpectedEOF
 	}

@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/nurtai325/qurtc/internal/ast"
 	"github.com/nurtai325/qurtc/internal/parser"
 )
 
@@ -23,10 +24,36 @@ func TestParser(t *testing.T) {
 			t.Fatal(err)
 		}
 		newParser := parser.New(entry.Name(), contents)
-		_, err = newParser.Parse()
+		decls, err := newParser.Parse()
 		if err != nil {
 			t.Errorf("expected successfully parsed file %s, got err %v", entry.Name(), err)
 		}
+		for _, decl := range decls {
+			varDecl := decl.(*ast.VarDecl)
+			fmt.Println(varDecl.Name.Value)
+			fmt.Println(varDecl.Type.Name.Value)
+			fmt.Println(varDecl.Type.Kind.String())
+			fmt.Println(varDecl.Type.IsArray)
+			fmt.Println(varDecl.Type.ArrayLen)
+
+			switch v := varDecl.Val.(type) {
+			case *ast.ArrayExpr:
+				for _, el := range v.Elements {
+					fmt.Printf("%+v, ", el)
+				}
+			case *ast.CallExpr:
+				fmt.Println(v.Func)
+				for _, el := range v.Args {
+					fmt.Printf("%+v, ", el)
+				}
+			default:
+				fmt.Printf("%+v\n", varDecl.Val)
+			}
+
+			fmt.Printf("%T\n", varDecl.Val)
+			fmt.Println()
+		}
+		t.Fail()
 		// for _, decl := range decls {
 		// 	funcDecl := decl.(*ast.FuncDecl)
 		// 	fmt.Println(funcDecl.Name)
