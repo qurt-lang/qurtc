@@ -46,6 +46,10 @@ func TestParser(t *testing.T) {
 				for _, el := range v.Args {
 					fmt.Printf("%+v, ", el)
 				}
+			case *ast.OpExpr:
+				fmt.Printf("%v ", v.Op)
+				fmt.Printf("%+v ", v.Left)
+				fmt.Printf("%+v\n", v.Right)
 			default:
 				fmt.Printf("%+v\n", varDecl.Val)
 			}

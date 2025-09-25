@@ -1,6 +1,7 @@
 package scanner
 
 import (
+	"fmt"
 	"unicode"
 	"unicode/utf8"
 
@@ -173,7 +174,7 @@ func (s *scanner) Scan() bool {
 	case ';':
 		s.lit, s.tok = "semicolon", token.SEMICOLON
 	default:
-		s.err = ErrInvalidCharacter
+		s.err = fmt.Errorf("%w: %c", ErrInvalidCharacter, ch)
 		s.lit, s.tok = token.ILLEGAL.String(), token.ILLEGAL
 	}
 

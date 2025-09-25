@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"github.com/nurtai325/qurtc/internal/ast"
 	"github.com/nurtai325/qurtc/internal/token"
 )
@@ -12,7 +10,6 @@ func (p *parser) varStmt() (*ast.VarStmt, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(varName.Value)
 	varType, err := p.typ()
 	if err != nil {
 		return nil, err

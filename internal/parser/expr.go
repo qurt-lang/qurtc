@@ -61,7 +61,6 @@ func (p *parser) expr(prec precedence) (ast.Expr, error) {
 		if infix == nil {
 			return left, nil
 		}
-		p.expect(nextTok)
 		left, err = infix(left)
 		if err != nil {
 			return nil, errors.Join(ErrInvalidExpr, err)
