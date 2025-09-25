@@ -145,7 +145,7 @@ type (
 	VarStmt struct {
 		Name *NameExpr
 		Type *Type
-		Val  Expr
+		Val  Expr // zero value if nil
 		stmt
 	}
 

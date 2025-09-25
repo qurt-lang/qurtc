@@ -14,6 +14,17 @@ func (p *parser) varStmt() (*ast.VarStmt, error) {
 	if err != nil {
 		return nil, err
 	}
+	tok, err := p.peek()
+	if err != nil {
+		return nil, err
+	}
+	if tok == token.SEMICOLON {
+		p.expect(token.SEMICOLON)
+		return &ast.VarStmt{
+			Name: varName,
+			Type: varType,
+		}, nil
+	}
 	if _, err = p.expect(token.ASSIGN); err != nil {
 		return nil, err
 	}
