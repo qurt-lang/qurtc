@@ -3,6 +3,7 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strconv"
 
 	"github.com/nurtai325/qurtc/internal/ast"
@@ -22,13 +23,22 @@ func New(filename string, input []byte) *parser {
 		s: scanner.New(filename, []byte(input)),
 	}
 	newParser.prefixFuncs = map[token.Token]func() (ast.Expr, error){
-		token.IDENT:  newParser.nameExpr,
+		token.IDENT: newParser.nameExpr,
+
 		token.LBRACE: newParser.array,
+
 		token.STRING: newParser.string,
 		token.INT:    newParser.int,
 		token.FLOAT:  newParser.float,
 		token.TRUE:   newParser.bool,
 		token.FALSE:  newParser.bool,
+
+		token.SUB: newParser.prefix,
+		token.NOT: newParser.prefix,
+	}
+	newParser.infixFuncs = make(map[token.Token]func(left ast.Expr) (ast.Expr, error))
+	for op := range precs {
+		newParser.infixFuncs[op] = newParser.infix
 	}
 	return newParser
 }
@@ -98,7 +108,10 @@ func (p *parser) typ() (*ast.Type, error) {
 }
 
 func (p *parser) arrlen() (int, error) {
-	p.expect(token.LBRACK)
+	_, err := p.expect(token.LBRACK)
+	if err != nil {
+		return 0, err
+	}
 	lit, err := p.expect(token.INT)
 	if err != nil {
 		return 0, err
@@ -113,15 +126,15 @@ func (p *parser) arrlen() (int, error) {
 	return int(arrayLen), nil
 }
 
-func (p *parser) expect(tok token.Token) (string, error) {
+func (p *parser) expect(toks ...token.Token) (string, error) {
 	if !p.s.Scan() {
 		if p.s.Tok() == token.EOF {
 			return "", ErrUnexpectedEOF
 		} else {
 			return "", p.s.Err()
 		}
-	} else if p.s.Tok() != tok {
-		return "", fmt.Errorf("күтпеген таңба немесе cөз: %q керек, бірақ %q табылды", tok.String(), p.s.Tok().String())
+	} else if !slices.Contains(toks, p.s.Tok()) {
+		return "", fmt.Errorf("күтпеген таңба немесе cөз: %v керек, бірақ %q табылды", toks, p.s.Tok().String())
 	}
 	return p.s.Lit(), nil
 }

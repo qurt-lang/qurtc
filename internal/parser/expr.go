@@ -8,24 +8,113 @@ import (
 	"github.com/nurtai325/qurtc/internal/token"
 )
 
-func (p *parser) expr() (ast.Expr, error) {
+type precedence int
+
+const (
+	_ precedence = iota
+	precOrOr
+	precAndAnd
+	precCmp
+	precAdd
+	precMul
+	precUnary
+)
+
+var precs = map[token.Token]precedence{
+	token.MUL: precMul,
+	token.DIV: precMul,
+	token.MOD: precMul,
+
+	token.ADD: precAdd,
+	token.SUB: precAdd,
+
+	token.EQL: precCmp,
+	token.LSS: precCmp,
+	token.GTR: precCmp,
+	token.NEQ: precCmp,
+	token.LEQ: precCmp,
+	token.GEQ: precCmp,
+
+	token.LAND: precAndAnd,
+	token.LOR:  precOrOr,
+}
+
+func (p *parser) expr(prec precedence) (ast.Expr, error) {
 	tok, err := p.peek()
 	if err != nil {
 		return nil, errors.Join(ErrInvalidExpr, err)
 	}
-	fn, ok := p.prefixFuncs[tok]
-	if !ok {
-		return nil, nil
+	prefix := p.prefixFuncs[tok]
+	if prefix == nil {
+		return nil, ErrInvalidExpr
 	}
-	return fn()
+	left, err := prefix()
+	if err != nil {
+		return nil, errors.Join(ErrInvalidExpr, err)
+	}
+	nextTok, err := p.peek()
+	if err != nil {
+		return nil, errors.Join(ErrInvalidExpr, err)
+	}
+	for nextTok != token.SEMICOLON && prec < p.prec(nextTok) {
+		infix := p.infixFuncs[nextTok]
+		if infix == nil {
+			return left, nil
+		}
+		p.expect(nextTok)
+		left, err = infix(left)
+		if err != nil {
+			return nil, errors.Join(ErrInvalidExpr, err)
+		}
+		nextTok, err = p.peek()
+		if err != nil {
+			return nil, errors.Join(ErrInvalidExpr, err)
+		}
+	}
+	return left, nil
 }
 
-func (p *parser) infix() (ast.Expr, error) {
-	return nil, nil
+func (p *parser) prefix() (ast.Expr, error) {
+	_, err := p.expect(token.SUB, token.NOT)
+	if err != nil {
+		return nil, err
+	}
+	op := p.s.Tok()
+	operand, err := p.expr(precUnary)
+	if err != nil {
+		return nil, err
+	}
+	return &ast.UnaryOpExpr{
+		Operand: operand,
+		Op:      op,
+	}, nil
 }
 
-func (p *parser) prefix(left ast.Expr) (ast.Expr, error) {
-	return nil, nil
+func (p *parser) infix(left ast.Expr) (ast.Expr, error) {
+	tok, err := p.peek()
+	if err != nil {
+		return nil, err
+	}
+	prec := p.prec(tok)
+	expr := ast.OpExpr{
+		Left: left,
+		Op:   tok,
+	}
+	p.expect(tok)
+
+	right, err := p.expr(prec)
+	if err != nil {
+		return nil, err
+	}
+	expr.Right = right
+	return &expr, nil
+}
+
+func (p *parser) prec(op token.Token) precedence {
+	if currPrec, ok := precs[op]; ok {
+		return currPrec
+	}
+	return 0
 }
 
 func (p *parser) nameExpr() (ast.Expr, error) {
@@ -69,7 +158,10 @@ func (p *parser) selector(name *ast.NameExpr) (*ast.SelectorExpr, error) {
 		Field: name,
 	}
 	for {
-		p.expect(token.PERIOD)
+		_, err := p.expect(token.PERIOD)
+		if err != nil {
+			return nil, err
+		}
 
 		name, err := p.name()
 		if err != nil {
@@ -96,7 +188,7 @@ func (p *parser) arrayAccess(name *ast.NameExpr) (*ast.ArrayAccessExpr, error) {
 	if err != nil {
 		return nil, err
 	}
-	index, err := p.expr()
+	index, err := p.expr(0)
 	if err != nil {
 		return nil, err
 	}
@@ -162,10 +254,16 @@ func (p *parser) bool() (ast.Expr, error) {
 		return nil, errors.Join(ErrInvalidBool, err)
 	}
 	if tok == token.TRUE {
-		p.expect(token.TRUE)
+		_, err := p.expect(token.TRUE)
+		if err != nil {
+			return nil, errors.Join(ErrInvalidBool, err)
+		}
 		return &ast.BoolExpr{Value: true}, nil
 	} else if tok == token.FALSE {
-		p.expect(token.FALSE)
+		_, err := p.expect(token.FALSE)
+		if err != nil {
+			return nil, errors.Join(ErrInvalidBool, err)
+		}
 		return &ast.BoolExpr{Value: false}, nil
 	}
 	return nil, errors.Join(ErrInvalidBool, err)
@@ -182,7 +280,7 @@ func (p *parser) exprList(end token.Token) ([]ast.Expr, error) {
 			break
 		}
 
-		element, err := p.expr()
+		element, err := p.expr(0)
 		if err != nil {
 			return nil, err
 		}
@@ -195,8 +293,14 @@ func (p *parser) exprList(end token.Token) ([]ast.Expr, error) {
 		if tok != token.COMMA {
 			break
 		}
-		p.expect(token.COMMA)
+		_, err = p.expect(token.COMMA)
+		if err != nil {
+			return nil, err
+		}
 	}
-	p.expect(end)
+	_, err := p.expect(end)
+	if err != nil {
+		return nil, err
+	}
 	return exprs, nil
 }

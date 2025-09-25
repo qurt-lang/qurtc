@@ -116,13 +116,13 @@ type (
 
 	UnaryOpExpr struct {
 		Op token.Token
-		X  Expr
+		Operand  Expr
 		expr
 	}
 
 	OpExpr struct {
 		Op   token.Token
-		X, Y Expr
+		Left, Right Expr
 		expr
 	}
 )
@@ -142,19 +142,19 @@ type (
 		aStmt()
 	}
 
+	VarStmt struct {
+		Name *NameExpr
+		Type *Type
+		Val  Expr
+		stmt
+	}
+
 	AssignStmt struct {
 		Var *NameExpr
 		Val Expr
 		stmt
 	}
 
-	BreakStmt struct {
-		stmt
-	}
-
-	ContinueStmt struct {
-		stmt
-	}
 
 	CallStmt struct {
 		CallExpr *CallExpr
@@ -181,10 +181,11 @@ type (
 		stmt
 	}
 
-	VarStmt struct {
-		Name *NameExpr
-		Type *Type
-		Val  Expr
+	BreakStmt struct {
+		stmt
+	}
+
+	ContinueStmt struct {
 		stmt
 	}
 )

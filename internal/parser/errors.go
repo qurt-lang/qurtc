@@ -15,7 +15,7 @@ var (
 	ErrInvalidStructDecl = errors.New("құрылым жариялаудың ережелері сақталмаған")
 	ErrInvalidVarDecl    = errors.New("айнымалы жариялаудың ережелері сақталмаған")
 
-	ErrInvalidExpr = errors.New("ережеге сай емес өрнек")
+	ErrInvalidExpr = errors.New("ережеге сай емес өрнек немесе өрнек табылмады")
 	ErrInvalidFuncCall = errors.New("функция шақыру ережесі сақталмаған")
 
 	ErrInvalidIdent  = errors.New("функция, айнымалы, тип атаулары ережеге сай есім болуы керек")
