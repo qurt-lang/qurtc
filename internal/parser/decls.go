@@ -1,9 +1,56 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/nurtai325/qurtc/internal/ast"
 	"github.com/nurtai325/qurtc/internal/token"
 )
+
+func (p *parser) funcDecl() (ast.Decl, error) {
+	typ, err := p.typ()
+	if err != nil {
+		return nil, err
+	}
+	name, err := p.name()
+	if err != nil {
+		return nil, err
+	}
+	_, err = p.expect(token.LPAREN)
+	if err != nil {
+		return nil, err
+	}
+	var args []*ast.FuncArg
+	for {
+		tok, err := p.peek()
+		if err != nil {
+			return nil, err
+		}
+		if tok == token.RPAREN {
+			p.expect(token.RPAREN)
+			break
+		}
+		fmt.Println(typ.Name.Value, name.Value, tok)
+		name, typ, err := p.fieldOrArg(token.RPAREN)
+		if err != nil {
+			return nil, err
+		}
+		args = append(args, &ast.FuncArg{
+			Name: name,
+			Type: typ,
+		})
+	}
+	body, err := p.block()
+	if err != nil {
+		return nil, err
+	}
+	return &ast.FuncDecl{
+		Name:       name,
+		Args:       args,
+		ReturnType: typ,
+		Body:       body,
+	}, nil
+}
 
 func (p *parser) varDecl() (ast.Decl, error) {
 	varStmt, err := p.varStmt()
@@ -34,11 +81,14 @@ func (p *parser) structDecl() (ast.Decl, error) {
 			p.expect(token.RBRACE)
 			break
 		}
-		field, err := p.field()
+		name, typ, err := p.fieldOrArg(token.RBRACE)
 		if err != nil {
 			return nil, err
 		}
-		fields = append(fields, field)
+		fields = append(fields, &ast.Field{
+			Name: name,
+			Type: typ,
+		})
 	}
 	return &ast.StructDecl{
 		Name:   name,
@@ -46,21 +96,26 @@ func (p *parser) structDecl() (ast.Decl, error) {
 	}, nil
 }
 
-func (p *parser) field() (*ast.Field, error) {
+func (p *parser) fieldOrArg(end token.Token) (string, *ast.Type, error) {
+	fmt.Println("hello", end)
 	name, err := p.name()
 	if err != nil {
-		return nil, err
+		fmt.Println("hello1")
+		return "", nil, err
 	}
 	typ, err := p.typ()
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
-	_, err = p.expect(token.SEMICOLON)
+	tok, err := p.peek()
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
-	return &ast.Field{
-		Name: name.Value,
-		Type: typ,
-	}, nil
+	if tok == token.COMMA {
+		p.expect(token.COMMA)
+		return name.Value, typ, nil
+	} else if tok == end {
+		return name.Value, typ, nil
+	}
+	return "", nil, ErrInvalidFieldOrArg
 }

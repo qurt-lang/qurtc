@@ -156,16 +156,6 @@ type (
 	}
 
 
-	CallStmt struct {
-		CallExpr *CallExpr
-		stmt
-	}
-
-	ReturnStmt struct {
-		Value Expr
-		stmt
-	}
-
 	IfStmt struct {
 		Cond Expr
 		Then Stmts
@@ -178,6 +168,16 @@ type (
 		Cond Expr
 		Post Stmt
 		Body Stmts
+		stmt
+	}
+
+	CallStmt struct {
+		CallExpr *CallExpr
+		stmt
+	}
+
+	ReturnStmt struct {
+		Value Expr
 		stmt
 	}
 

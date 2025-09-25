@@ -31,7 +31,20 @@ func TestParser(t *testing.T) {
 		for _, decl := range decls {
 			varDecl, ok := decl.(*ast.VarDecl)
 			if !ok {
-				structDecl := decl.(*ast.StructDecl)
+				structDecl, ok := decl.(*ast.StructDecl)
+				if !ok {
+					funcDecl := decl.(*ast.FuncDecl)
+					fmt.Printf("%+v\n", funcDecl.Name)
+					fmt.Printf("%+v\n", funcDecl.ReturnType)
+					for _, arg := range funcDecl.Args {
+						fmt.Printf("%s %+v\n", arg.Name, arg.Type)
+					}
+					for _, stmt := range funcDecl.Body {
+						fmt.Printf("%+v\n", stmt)
+					}
+					fmt.Println()
+					continue
+				}
 				fmt.Printf("%+v\n", structDecl.Name)
 				for _, field := range structDecl.Fields {
 					fmt.Printf("%s %+v\n", field.Name, field.Type)

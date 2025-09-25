@@ -47,11 +47,11 @@ func (p *parser) Parse() (decls []ast.Decl, err error) {
 	// TODO: add known errors, return them from functions without panicking
 	for p.s.Scan() {
 		switch p.s.Tok() {
-		// case token.FUNC:
-		// 	decls, err = p.appendDecl(decls, p.funcDecl)
-		// 	if err != nil {
-		// 		return nil, p.errorAt(errors.Join(ErrInvalidFuncDecl, err), help.FunctionsPage)
-		// 	}
+		case token.FUNC:
+			decls, err = p.appendDecl(decls, p.funcDecl)
+			if err != nil {
+				return nil, p.errorAt(errors.Join(ErrInvalidFuncDecl, err), help.FunctionsPage)
+			}
 		case token.STRUCT:
 			decls, err = p.appendDecl(decls, p.structDecl)
 			if err != nil {
