@@ -16,7 +16,9 @@ var (
 	ErrInvalidVarDecl    = errors.New("айнымалы жариялаудың ережелері сақталмаған")
 	ErrInvalidFieldOrArg = errors.New("ережеге сай емес аргумент немесе құрылым мүшесі")
 
-	ErrInvalidExpr = errors.New("ережеге сай емес өрнек немесе өрнек табылмады")
+	ErrUnknownStmt = errors.New("бұндай оператор немесе нұсқау жоқ")
+
+	ErrInvalidExpr     = errors.New("ережеге сай емес өрнек табылмады")
 	ErrInvalidFuncCall = errors.New("функция шақыру ережесі сақталмаған")
 
 	ErrInvalidIdent  = errors.New("функция, айнымалы, тип атаулары ережеге сай есім болуы керек")

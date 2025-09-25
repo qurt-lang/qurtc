@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"github.com/nurtai325/qurtc/internal/ast"
 	"github.com/nurtai325/qurtc/internal/token"
 )
@@ -30,7 +28,6 @@ func (p *parser) funcDecl() (ast.Decl, error) {
 			p.expect(token.RPAREN)
 			break
 		}
-		fmt.Println(typ.Name.Value, name.Value, tok)
 		name, typ, err := p.fieldOrArg(token.RPAREN)
 		if err != nil {
 			return nil, err
@@ -97,10 +94,8 @@ func (p *parser) structDecl() (ast.Decl, error) {
 }
 
 func (p *parser) fieldOrArg(end token.Token) (string, *ast.Type, error) {
-	fmt.Println("hello", end)
 	name, err := p.name()
 	if err != nil {
-		fmt.Println("hello1")
 		return "", nil, err
 	}
 	typ, err := p.typ()

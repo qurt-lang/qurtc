@@ -150,11 +150,15 @@ type (
 	}
 
 	AssignStmt struct {
-		Var *NameExpr
+		Var Expr // *ArrayAccess, *Selector, *NameExpr
 		Val Expr
 		stmt
 	}
 
+	CallStmt struct {
+		CallExpr *CallExpr
+		stmt
+	}
 
 	IfStmt struct {
 		Cond Expr
@@ -168,11 +172,6 @@ type (
 		Cond Expr
 		Post Stmt
 		Body Stmts
-		stmt
-	}
-
-	CallStmt struct {
-		CallExpr *CallExpr
 		stmt
 	}
 
