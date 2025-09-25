@@ -18,10 +18,38 @@ func (p *parser) stmt() (ast.Stmt, error) {
 		if err != nil {
 			return nil, err
 		}
-		return p.assignOrCall(varName)
+		stmt, err := p.assignOrCallStmt(varName)
+		if err != nil {
+			return nil, err
+		}
+		if _, err = p.expect(token.SEMICOLON); err != nil {
+			fmt.Println("hello", varName.Value)
+			return nil, err
+		}
+		return stmt, nil
 	case token.VAR:
 		p.expect(token.VAR)
 		return p.varStmt()
+	case token.IF:
+		p.expect(token.IF)
+		return p.ifStmt()
+	case token.FOR:
+		p.expect(token.FOR)
+		return p.forStmt()
+	case token.CONTINUE:
+		p.expect(token.CONTINUE)
+		_, err = p.expect(token.SEMICOLON)
+		if err != nil {
+			return nil, err
+		}
+		return &ast.ContinueStmt{}, nil
+	case token.BREAK:
+		p.expect(token.BREAK)
+		_, err = p.expect(token.SEMICOLON)
+		if err != nil {
+			return nil, err
+		}
+		return &ast.BreakStmt{}, nil
 	case token.RETURN:
 		p.expect(token.RETURN)
 		val, err := p.expr(0)
@@ -35,8 +63,9 @@ func (p *parser) stmt() (ast.Stmt, error) {
 		return &ast.ReturnStmt{
 			Value: val,
 		}, nil
+	default:
+		return nil, ErrUnknownStmt
 	}
-	return nil, nil
 }
 
 func (p *parser) block() ([]ast.Stmt, error) {
@@ -60,6 +89,98 @@ func (p *parser) block() ([]ast.Stmt, error) {
 		stmts = append(stmts, stmt)
 	}
 	return stmts, nil
+}
+
+func (p *parser) ifStmt() (*ast.IfStmt, error) {
+	var stmt *ast.IfStmt = &ast.IfStmt{}
+
+	_, err := p.expect(token.LPAREN)
+	if err != nil {
+		return nil, err
+	}
+	stmt.Cond, err = p.expr(0)
+	if err != nil {
+		return nil, err
+	}
+	_, err = p.expect(token.RPAREN)
+	if err != nil {
+		return nil, err
+	}
+	stmt.Then, err = p.block()
+	if err != nil {
+		return nil, err
+	}
+
+	tok, err := p.peek()
+	if err != nil {
+		return nil, err
+	}
+	if tok == token.ELSE {
+		p.expect(token.ELSE)
+		tok, err := p.peek()
+		if err != nil {
+			return nil, err
+		}
+		if tok == token.IF {
+			p.expect()
+			stmt.Else, err = p.ifStmt()
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			stmtElse, err := p.block()
+			if err != nil {
+				return nil, err
+			}
+			stmt.Else = ast.Stmts(stmtElse)
+		}
+	}
+	return stmt, nil
+}
+
+func (p *parser) forStmt() (*ast.ForStmt, error) {
+	_, err := p.expect(token.LPAREN)
+	if err != nil {
+		return nil, err
+	}
+	_, err = p.expect(token.VAR)
+	if err != nil {
+		return nil, err
+	}
+	init, err := p.varStmt()
+	if err != nil {
+		return nil, err
+	}
+	cond, err := p.expr(0)
+	if err != nil {
+		return nil, err
+	}
+	_, err = p.expect(token.SEMICOLON)
+	if err != nil {
+		return nil, err
+	}
+	varName, err := p.name()
+	if err != nil {
+		return nil, err
+	}
+	post, err := p.assignOrCallStmt(varName)
+	if err != nil {
+		return nil, err
+	}
+	_, err = p.expect(token.RPAREN)
+	if err != nil {
+		return nil, err
+	}
+	body, err := p.block()
+	if err != nil {
+		return nil, err
+	}
+	return &ast.ForStmt{
+		Init: init,
+		Cond: cond,
+		Post: post,
+		Body: body,
+	}, nil
 }
 
 func (p *parser) varStmt() (*ast.VarStmt, error) {
@@ -99,7 +220,7 @@ func (p *parser) varStmt() (*ast.VarStmt, error) {
 	}, nil
 }
 
-func (p *parser) assignOrCall(varName *ast.NameExpr) (ast.Stmt, error) {
+func (p *parser) assignOrCallStmt(varName *ast.NameExpr) (ast.Stmt, error) {
 	tok, err := p.peek()
 	if err != nil {
 		return nil, err
@@ -129,9 +250,6 @@ func (p *parser) assignOrCall(varName *ast.NameExpr) (ast.Stmt, error) {
 		if err != nil {
 			return nil, err
 		}
-		if _, err = p.expect(token.SEMICOLON); err != nil {
-			return nil, err
-		}
 		return &ast.AssignStmt{
 			Var: assignee,
 			Val: val,
@@ -145,7 +263,6 @@ func (p *parser) assignOrCall(varName *ast.NameExpr) (ast.Stmt, error) {
 			CallExpr: call,
 		}, nil
 	default:
-		fmt.Println(varName.Value, tok)
 		return nil, ErrUnknownStmt
 	}
 }

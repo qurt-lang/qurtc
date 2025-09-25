@@ -168,7 +168,7 @@ type (
 	}
 
 	ForStmt struct {
-		Init *VarDecl
+		Init *VarStmt
 		Cond Expr
 		Post Stmt
 		Body Stmts
