@@ -29,7 +29,16 @@ func TestParser(t *testing.T) {
 			t.Errorf("expected successfully parsed file %s, got err %v", entry.Name(), err)
 		}
 		for _, decl := range decls {
-			varDecl := decl.(*ast.VarDecl)
+			varDecl, ok := decl.(*ast.VarDecl)
+			if !ok {
+				structDecl := decl.(*ast.StructDecl)
+				fmt.Printf("%+v\n", structDecl.Name)
+				for _, field := range structDecl.Fields {
+					fmt.Printf("%s %+v\n", field.Name, field.Type)
+				}
+				fmt.Println()
+				continue
+			}
 			fmt.Println(varDecl.Name.Value)
 			fmt.Println(varDecl.Type.Name.Value)
 			fmt.Println(varDecl.Type.Kind.String())

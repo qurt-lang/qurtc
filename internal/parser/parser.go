@@ -52,11 +52,11 @@ func (p *parser) Parse() (decls []ast.Decl, err error) {
 		// 	if err != nil {
 		// 		return nil, p.errorAt(errors.Join(ErrInvalidFuncDecl, err), help.FunctionsPage)
 		// 	}
-		// case token.STRUCT:
-		// 	decls, err = p.appendDecl(decls, p.structDecl)
-		// 	if err != nil {
-		// 		return nil, p.errorAt(errors.Join(ErrInvalidStructDecl, err), help.StructsPage)
-		// 	}
+		case token.STRUCT:
+			decls, err = p.appendDecl(decls, p.structDecl)
+			if err != nil {
+				return nil, p.errorAt(errors.Join(ErrInvalidStructDecl, err), help.StructsPage)
+			}
 		case token.VAR:
 			decls, err = p.appendDecl(decls, p.varDecl)
 			if err != nil {
