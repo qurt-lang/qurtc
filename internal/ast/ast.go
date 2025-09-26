@@ -2,6 +2,7 @@ package ast
 
 import (
 	"github.com/nurtai325/qurtc/internal/token"
+	"github.com/nurtai325/qurtc/internal/types"
 )
 
 // Declarations
@@ -29,7 +30,7 @@ type (
 	// only for builtin funcs
 	BuiltinFuncDecl struct {
 		Name *NameExpr
-		Body func(...any) error
+		Body func(args ...types.Type) error
 		decl
 	}
 )
@@ -202,7 +203,7 @@ type Type struct {
 type Kind int
 
 func GetKind(typeName string) Kind {
-	for i, kindName := range types {
+	for i, kindName := range primitiveTypes {
 		if typeName == kindName {
 			return Kind(i)
 		}
@@ -211,10 +212,10 @@ func GetKind(typeName string) Kind {
 }
 
 func (k Kind) String() string {
-	if int(k) >= len(types) {
+	if int(k) >= len(primitiveTypes) {
 		return token.STRUCT.String()
 	}
-	return types[k]
+	return primitiveTypes[k]
 }
 
 const (
@@ -226,7 +227,7 @@ const (
 	TStruct
 )
 
-var types = [...]string{
+var primitiveTypes = [...]string{
 	TVoid:   "ештеңе",
 	TInt:    "бүтін",
 	TFloat:  "бөлшек",

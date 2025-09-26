@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"github.com/nurtai325/qurtc/internal/ast"
-	"github.com/nurtai325/qurtc/internal/parser"
 )
 
 const mainName = "негізгі"
@@ -49,18 +48,9 @@ func (m *machine) Run() error {
 	if len(main.Args) != 0 || main.ReturnType.Kind != ast.TVoid {
 		return ErrInvalidMain
 	}
-	_, err := m.call(main.Name)
+	_, err := m.call(main.Name, nil)
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-func (m *machine) exec(parentScope *scope, stmt ast.Stmt) (*ast.Expr, error) {
-	switch v := stmt.(type) {
-	case *ast.CallStmt:
-		return m.call(v.CallExpr.Func, v.CallExpr.Args...)
-	default:
-		return nil, parser.ErrUnknownStmt
-	}
 }
