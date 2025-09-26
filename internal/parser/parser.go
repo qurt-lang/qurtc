@@ -57,11 +57,6 @@ func (p *parser) Parse() (decls []ast.Decl, err error) {
 			if err != nil {
 				return nil, p.errorAt(errors.Join(ErrInvalidStructDecl, err), help.StructsPage)
 			}
-		case token.VAR:
-			decls, err = p.appendDecl(decls, p.varDecl)
-			if err != nil {
-				return nil, p.errorAt(errors.Join(ErrInvalidVarDecl, err), help.VarsPage)
-			}
 		default:
 			return nil, p.errorAt(ErrUnknownDecl, help.SyntaxPage)
 		}

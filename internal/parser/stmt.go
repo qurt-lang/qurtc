@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"github.com/nurtai325/qurtc/internal/ast"
 	"github.com/nurtai325/qurtc/internal/token"
 )
@@ -14,16 +12,11 @@ func (p *parser) stmt() (ast.Stmt, error) {
 	}
 	switch tok {
 	case token.IDENT:
-		varName, err := p.name()
-		if err != nil {
-			return nil, err
-		}
-		stmt, err := p.assignOrCallStmt(varName)
+		stmt, err := p.assignStmt()
 		if err != nil {
 			return nil, err
 		}
 		if _, err = p.expect(token.SEMICOLON); err != nil {
-			fmt.Println("hello", varName.Value)
 			return nil, err
 		}
 		return stmt, nil
@@ -159,11 +152,7 @@ func (p *parser) forStmt() (*ast.ForStmt, error) {
 	if err != nil {
 		return nil, err
 	}
-	varName, err := p.name()
-	if err != nil {
-		return nil, err
-	}
-	post, err := p.assignOrCallStmt(varName)
+	post, err := p.assignStmt()
 	if err != nil {
 		return nil, err
 	}
@@ -220,49 +209,23 @@ func (p *parser) varStmt() (*ast.VarStmt, error) {
 	}, nil
 }
 
-func (p *parser) assignOrCallStmt(varName *ast.NameExpr) (ast.Stmt, error) {
-	tok, err := p.peek()
+func (p *parser) assignStmt() (ast.Stmt, error) {
+	assignee, err := p.nameExpr()
 	if err != nil {
 		return nil, err
 	}
-	switch tok {
-	case token.PERIOD, token.LBRACK, token.ASSIGN:
-		var assignee ast.Expr
-		switch tok {
-		case token.PERIOD:
-			assignee, err = p.selector(varName)
-			if err != nil {
-				return nil, err
-			}
-		case token.LBRACK:
-			assignee, err = p.arrayAccess(varName)
-			if err != nil {
-				return nil, err
-			}
-		case token.ASSIGN:
-			assignee = varName
-		default:
-			return nil, ErrUnknownStmt
-		}
-
-		p.expect(token.ASSIGN)
-		val, err := p.expr(0)
-		if err != nil {
-			return nil, err
-		}
-		return &ast.AssignStmt{
-			Var: assignee,
-			Val: val,
-		}, nil
-	case token.LPAREN:
-		call, err := p.call(varName)
-		if err != nil {
-			return nil, err
-		}
+	if call, ok := assignee.(*ast.CallExpr); ok {
 		return &ast.CallStmt{
 			CallExpr: call,
 		}, nil
-	default:
-		return nil, ErrUnknownStmt
 	}
+	p.expect(token.ASSIGN)
+	val, err := p.expr(0)
+	if err != nil {
+		return nil, err
+	}
+	return &ast.AssignStmt{
+		Var: assignee,
+		Val: val,
+	}, nil
 }

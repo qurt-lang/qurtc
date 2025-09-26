@@ -4,20 +4,11 @@ import (
 	"github.com/nurtai325/qurtc/internal/token"
 )
 
-type Node interface {
-	aNode()
-}
-
-type node struct{}
-
-func (*node) aNode() {}
-
 // Declarations
 // ----------------------------------------------------------------------------
 
 type (
 	Decl interface {
-		Node
 		aDecl()
 	}
 
@@ -27,22 +18,23 @@ type (
 		decl
 	}
 
-	VarDecl struct {
-		*VarStmt
-		decl
-	}
-
 	FuncDecl struct {
 		Name       *NameExpr
 		Args       []*FuncArg
 		ReturnType *Type
-		Body       Stmts
+		Body       []Stmt
+		decl
+	}
+
+	// only for builtin funcs
+	BuiltinFuncDecl struct {
+		Name *NameExpr
+		Body func(...any) error
 		decl
 	}
 )
 
 type decl struct {
-	node
 }
 
 func (*decl) aDecl() {}
@@ -62,7 +54,6 @@ type Field struct {
 
 type (
 	Expr interface {
-		Node
 		aExpr()
 	}
 
@@ -97,38 +88,37 @@ type (
 	}
 
 	CallExpr struct {
-		Func *NameExpr
+		Func Expr
 		Args []Expr // if nil then no args
 		expr
 	}
 
 	SelectorExpr struct {
-		Struct *SelectorExpr
+		Struct Expr
 		Field  *NameExpr
 		expr
 	}
 
 	ArrayAccessExpr struct {
-		Array *NameExpr
+		Array Expr
 		Index Expr
 		expr
 	}
 
 	UnaryOpExpr struct {
-		Op token.Token
-		Operand  Expr
+		Op      token.Token
+		Operand Expr
 		expr
 	}
 
 	OpExpr struct {
-		Op   token.Token
+		Op          token.Token
 		Left, Right Expr
 		expr
 	}
 )
 
 type expr struct {
-	node
 }
 
 func (*expr) aExpr() {}
@@ -138,7 +128,6 @@ func (*expr) aExpr() {}
 
 type (
 	Stmt interface {
-		Node
 		aStmt()
 	}
 
@@ -162,7 +151,7 @@ type (
 
 	IfStmt struct {
 		Cond Expr
-		Then Stmts
+		Then []Stmt
 		Else Stmt // either nil, *IfStmt or Stmts
 		stmt
 	}
@@ -171,7 +160,7 @@ type (
 		Init *VarStmt
 		Cond Expr
 		Post Stmt
-		Body Stmts
+		Body []Stmt
 		stmt
 	}
 
@@ -190,7 +179,6 @@ type (
 )
 
 type stmt struct {
-	node
 }
 
 func (*stmt) aStmt() {}

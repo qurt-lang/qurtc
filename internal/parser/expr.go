@@ -117,27 +117,40 @@ func (p *parser) prec(op token.Token) precedence {
 }
 
 func (p *parser) nameExpr() (ast.Expr, error) {
+	var expr ast.Expr
 	name, err := p.name()
 	if err != nil {
 		return nil, err
 	}
-	tok, err := p.peek()
-	if err != nil {
-		return nil, err
-	}
-	switch tok {
-	case token.LPAREN:
-		return p.call(name)
-	case token.PERIOD:
-		return p.selector(name)
-	case token.LBRACK:
-		return p.arrayAccess(name)
-	default:
-		return name, nil
+	expr = name
+	for {
+		tok, err := p.peek()
+		if err != nil {
+			return nil, err
+		}
+		switch tok {
+		case token.LPAREN:
+			expr, err = p.call(expr)
+			if err != nil {
+				return nil, err
+			}
+		case token.PERIOD:
+			expr, err = p.selector(expr)
+			if err != nil {
+				return nil, err
+			}
+		case token.LBRACK:
+			expr, err = p.arrayAccess(expr)
+			if err != nil {
+				return nil, err
+			}
+		default:
+			return expr, nil
+		}
 	}
 }
 
-func (p *parser) call(name *ast.NameExpr) (*ast.CallExpr, error) {
+func (p *parser) call(caller ast.Expr) (*ast.CallExpr, error) {
 	_, err := p.expect(token.LPAREN)
 	if err != nil {
 		return nil, errors.Join(ErrInvalidFuncCall, err)
@@ -147,14 +160,14 @@ func (p *parser) call(name *ast.NameExpr) (*ast.CallExpr, error) {
 		return nil, errors.Join(ErrInvalidFuncCall, err)
 	}
 	return &ast.CallExpr{
-		Func: name,
+		Func: caller,
 		Args: args,
 	}, nil
 }
 
-func (p *parser) selector(name *ast.NameExpr) (*ast.SelectorExpr, error) {
+func (p *parser) selector(obj ast.Expr) (*ast.SelectorExpr, error) {
 	selectorExpr := &ast.SelectorExpr{
-		Field: name,
+		Struct: obj,
 	}
 	for {
 		_, err := p.expect(token.PERIOD)
@@ -182,7 +195,7 @@ func (p *parser) selector(name *ast.NameExpr) (*ast.SelectorExpr, error) {
 	return selectorExpr, nil
 }
 
-func (p *parser) arrayAccess(name *ast.NameExpr) (*ast.ArrayAccessExpr, error) {
+func (p *parser) arrayAccess(arr ast.Expr) (*ast.ArrayAccessExpr, error) {
 	_, err := p.expect(token.LBRACK)
 	if err != nil {
 		return nil, err
@@ -196,7 +209,7 @@ func (p *parser) arrayAccess(name *ast.NameExpr) (*ast.ArrayAccessExpr, error) {
 		return nil, err
 	}
 	return &ast.ArrayAccessExpr{
-		Array: name,
+		Array: arr,
 		Index: index,
 	}, nil
 }
@@ -252,20 +265,22 @@ func (p *parser) bool() (ast.Expr, error) {
 	if err != nil {
 		return nil, errors.Join(ErrInvalidBool, err)
 	}
-	if tok == token.TRUE {
+	switch tok {
+	case token.TRUE:
 		_, err := p.expect(token.TRUE)
 		if err != nil {
 			return nil, errors.Join(ErrInvalidBool, err)
 		}
 		return &ast.BoolExpr{Value: true}, nil
-	} else if tok == token.FALSE {
+	case token.FALSE:
 		_, err := p.expect(token.FALSE)
 		if err != nil {
 			return nil, errors.Join(ErrInvalidBool, err)
 		}
 		return &ast.BoolExpr{Value: false}, nil
+	default:
+		return nil, errors.Join(ErrInvalidBool, err)
 	}
-	return nil, errors.Join(ErrInvalidBool, err)
 }
 
 func (p *parser) exprList(end token.Token) ([]ast.Expr, error) {

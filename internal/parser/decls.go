@@ -49,16 +49,6 @@ func (p *parser) funcDecl() (ast.Decl, error) {
 	}, nil
 }
 
-func (p *parser) varDecl() (ast.Decl, error) {
-	varStmt, err := p.varStmt()
-	if err != nil {
-		return nil, err
-	}
-	return &ast.VarDecl{
-		VarStmt: varStmt,
-	}, nil
-}
-
 func (p *parser) structDecl() (ast.Decl, error) {
 	name, err := p.name()
 	if err != nil {

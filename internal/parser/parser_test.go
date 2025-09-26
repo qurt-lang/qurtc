@@ -1,31 +1,18 @@
 package parser_test
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
 	"github.com/nurtai325/qurtc/internal/parser"
+	"github.com/nurtai325/qurtc/internal/testutils"
 )
 
 func TestParser(t *testing.T) {
-	const examplesDir = "../../examples"
-	entries, err := os.ReadDir(examplesDir)
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, entry := range entries {
-		if entry.IsDir() {
-			continue
-		}
-		contents, err := os.ReadFile(fmt.Sprintf("%s/%s", examplesDir, entry.Name()))
+	testutils.RunOnExamples(func(name string, contents []byte) {
+		newParser := parser.New(name, contents)
+		_, err := newParser.Parse()
 		if err != nil {
-			t.Fatal(err)
+			t.Errorf("expected successfully parsed file %s, got err %v", name, err)
 		}
-		newParser := parser.New(entry.Name(), contents)
-		_, err = newParser.Parse()
-		if err != nil {
-			t.Errorf("expected successfully parsed file %s, got err %v", entry.Name(), err)
-		}
-	}
+	})
 }
