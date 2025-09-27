@@ -25,6 +25,17 @@ func (m *machine) eval(exprScope *scope, expr ast.Expr) (types.Type, error) {
 			return nil, ErrUndefinedReference
 		}
 		return variable, nil
+	case *ast.ArrayExpr:
+		fmt.Println("hello")
+		elements, err := m.evalAll(exprScope, v.Elements)
+		if err != nil {
+			fmt.Println("hello")
+			return nil, err
+		}
+		if !types.IsSameType(elements...) {
+			return nil, types.ErrNotSameType
+		}
+		return types.NewArray(elements)
 	case *ast.CallExpr:
 		args, err := m.evalAll(exprScope, v.Args)
 		if err != nil {
@@ -102,7 +113,7 @@ func (m *machine) call(fn ast.Expr, args []types.Type) (types.Type, error) {
 }
 
 func (m *machine) binary(op token.Token, x, y types.Type) (types.Type, error) {
-	if fmt.Sprintf("%T", x) != fmt.Sprintf("%T", y) {
+	if !types.IsSameType(x, y) {
 		return nil, ErrNotSameTypeOp
 	}
 	switch op {

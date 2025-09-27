@@ -19,7 +19,7 @@ func newFuncScope(funcDecl *ast.FuncDecl, args []types.Type) (*scope, error) {
 		vars: make(map[string]types.Type, len(funcDecl.Args)),
 	}
 	for i, arg := range funcDecl.Args {
-		if !types.IsOfType(args[i], arg) {
+		if !types.IsOfType(args[i], arg.Type) {
 			return nil, ErrFuncArgMismatch
 		}
 		newScope.add(arg.Name, args[i])

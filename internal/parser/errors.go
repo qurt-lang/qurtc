@@ -11,7 +11,6 @@ var (
 	ErrUnexpectedEOF = errors.New("файл күтпеген жерден аяқталады")
 
 	ErrUnknownDecl       = errors.New("функция сыртында тек жаңа айнымалы, функция, құрылым жариялауға ғана болады")
-	ErrUnknownType       = errors.New("бұндай тип жоқ")
 	ErrInvalidFuncDecl   = errors.New("функция жариялаудың ережелері сақталмаған")
 	ErrInvalidStructDecl = errors.New("құрылым жариялаудың ережелері сақталмаған")
 	ErrInvalidVarDecl    = errors.New("айнымалы жариялаудың ережелері сақталмаған")
@@ -29,7 +28,7 @@ var (
 	ErrInvalidFloat  = errors.New("ережеге сай емес БӨЛШЕК")
 	ErrInvalidBool   = errors.New("ережеге сай емес ШЫН")
 
-	ErrInvalidArrayLen = errors.New("тізім ұзындығы тек БҮТІН сан ғана бола алады және [] арасында болу керек")
+	ErrInvalidArrayLen = errors.New("тізім ұзындығы 0 бола алмайды және тек БҮТІН сан ғана бола алады және [] арасында болу керек")
 	ErrInvalidTypeName = errors.New("айнымалы немесе функция аргументі типі ережеге сай есім болу керек")
 )
 

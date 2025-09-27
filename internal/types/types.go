@@ -1,6 +1,10 @@
 package types
 
-import "github.com/nurtai325/qurtc/internal/token"
+import (
+	"fmt"
+
+	"github.com/nurtai325/qurtc/internal/token"
+)
 
 type (
 	Type interface {
@@ -14,6 +18,11 @@ type (
 	String string
 
 	Bool bool
+
+	Array struct {
+		elements []Type
+		length   int
+	}
 )
 
 func (b Bool) String() string {
@@ -24,6 +33,10 @@ func (b Bool) String() string {
 	}
 }
 
+func (a *Array) String() string {
+	return fmt.Sprint(a.elements)
+}
+
 func (Int) aType() {}
 
 func (Float) aType() {}
@@ -31,3 +44,5 @@ func (Float) aType() {}
 func (String) aType() {}
 
 func (Bool) aType() {}
+
+func (*Array) aType() {}

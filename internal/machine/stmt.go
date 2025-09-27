@@ -11,16 +11,36 @@ func (m *machine) exec(parentScope *scope, stmt ast.Stmt) (types.Type, error) {
 	case *ast.VarStmt:
 		var val types.Type
 		if v.Val == nil {
-			val = types.ZeroOf(v.Type)
-			if val == nil {
-				return nil, parser.ErrUnknownType
+			if v.Type.IsArray {
+				elements := make([]types.Type, 0, v.Type.ArrayLen)
+				for range v.Type.ArrayLen {
+					val, err := types.ZeroOf(v.Type)
+					if err != nil {
+						return nil, err
+					}
+					elements = append(elements, val)
+				}
+				arr, err := types.NewArray(elements)
+				if err != nil {
+					return nil, err
+				}
+				val = arr
+			} else {
+				res, err := types.ZeroOf(v.Type)
+				if err != nil {
+					return nil, err
+				}
+				val = res
 			}
 		} else {
-			value, err := m.eval(parentScope, v.Val)
+			res, err := m.eval(parentScope, v.Val)
 			if err != nil {
 				return nil, err
 			}
-			val = value
+			if !types.IsOfType(res, v.Type) {
+				return nil, types.ErrNotSameType
+			}
+			val = res
 		}
 		if !parentScope.add(v.Name.Value, val) {
 			return nil, ErrVarExists
