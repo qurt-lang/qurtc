@@ -1,5 +1,10 @@
 package main
 
+import "log"
+
 func main() {
-	Main()
+	err := Main()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
