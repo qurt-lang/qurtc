@@ -2,7 +2,6 @@ package ast
 
 import (
 	"github.com/nurtai325/qurtc/internal/token"
-	"github.com/nurtai325/qurtc/internal/types"
 )
 
 // Declarations
@@ -30,7 +29,7 @@ type (
 	// only for builtin funcs
 	BuiltinFuncDecl struct {
 		Name *NameExpr
-		Body func(args ...types.Type) error
+		Body func(args ...any) error
 		decl
 	}
 )

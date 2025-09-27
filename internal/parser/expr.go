@@ -36,7 +36,8 @@ var precs = map[token.Token]precedence{
 	token.GEQ: precCmp,
 
 	token.LAND: precAndAnd,
-	token.LOR:  precOrOr,
+
+	token.LOR: precOrOr,
 }
 
 func (p *parser) expr(prec precedence) (ast.Expr, error) {

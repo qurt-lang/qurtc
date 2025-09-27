@@ -11,6 +11,7 @@ var (
 	ErrUnexpectedEOF = errors.New("файл күтпеген жерден аяқталады")
 
 	ErrUnknownDecl       = errors.New("функция сыртында тек жаңа айнымалы, функция, құрылым жариялауға ғана болады")
+	ErrUnknownType       = errors.New("бұндай тип жоқ")
 	ErrInvalidFuncDecl   = errors.New("функция жариялаудың ережелері сақталмаған")
 	ErrInvalidStructDecl = errors.New("құрылым жариялаудың ережелері сақталмаған")
 	ErrInvalidVarDecl    = errors.New("айнымалы жариялаудың ережелері сақталмаған")

@@ -18,9 +18,8 @@ func builtinPrint(m *machine) (string, *ast.BuiltinFuncDecl) {
 	name := "жаз"
 	return name, &ast.BuiltinFuncDecl{
 		Name: &ast.NameExpr{Value: name},
-		Body: func(args ...types.Type) error {
-			argsAny := typesToAny(args)
-			_, err := fmt.Fprintln(m.stdout, argsAny...)
+		Body: func(args ...any) error {
+			_, err := fmt.Fprintln(m.stdout, args...)
 			if err != nil {
 				return err
 			}
