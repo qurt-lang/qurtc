@@ -25,7 +25,7 @@ type (
 	}
 
 	Struct struct {
-		name   string
+		typeName   string
 		fields map[string]Type
 	}
 )

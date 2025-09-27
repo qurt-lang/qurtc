@@ -100,23 +100,23 @@ func (m *machine) exec(parentScope *scope, stmt ast.Stmt) (types.Type, error) {
 		if !ok {
 			return nil, ErrIfWithNoBool
 		}
-		ifScope := parentScope.clone()
+		ifScope := parentScope.newBlockScope()
 		if cond == false {
 			if v.Else == nil {
 				return nil, nil
 			}
 			switch elseBlock := v.Else.(type) {
 			case ast.Stmts:
-				return m.execBlock(ifScope.clone(), v.Then)
+				return m.execBlock(ifScope.newBlockScope(), v.Then)
 			case *ast.IfStmt:
 				return m.exec(ifScope, elseBlock)
 			default:
 				return nil, ErrInvalidElse
 			}
 		}
-		return m.execBlock(ifScope, v.Then)
+		return m.execBlock(ifScope.newBlockScope(), v.Then)
 	case *ast.ForStmt:
-		loopScope := parentScope.clone()
+		loopScope := parentScope.newBlockScope()
 		loopScope.isLoop = true
 		_, err := m.exec(loopScope, v.Init)
 		if err != nil {
@@ -136,14 +136,16 @@ func (m *machine) exec(parentScope *scope, stmt ast.Stmt) (types.Type, error) {
 				break
 			}
 
-			retVal, err := m.execBlock(loopScope, v.Body)
+			iterScope := loopScope.newBlockScope()
+			iterScope.isLoop = true
+			retVal, err := m.execBlock(iterScope, v.Body)
 			if err != nil {
 				return nil, err
 			}
 			if retVal != nil {
 				return retVal, nil
 			}
-			if loopScope.isBreak {
+			if iterScope.isBreak {
 				break
 			}
 

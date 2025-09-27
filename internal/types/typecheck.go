@@ -17,6 +17,7 @@ func ZeroOf(typ *ast.Type, structTypes map[string]*ast.StructDecl) (Type, error)
 			}
 			elements = append(elements, val)
 		}
+		typ.IsArray = true
 		return NewArray(elements)
 	}
 	switch typ.Kind {
@@ -70,7 +71,7 @@ func IsOfType(val Type, typ *ast.Type) bool {
 		}
 		return true
 	case *Struct:
-		return typ.Kind == ast.TStruct && typ.Name.Value == v.name
+		return typ.Kind == ast.TStruct && typ.Name.Value == v.typeName
 	default:
 		return false
 	}

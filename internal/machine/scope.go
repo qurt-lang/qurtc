@@ -2,13 +2,15 @@ package machine
 
 import (
 	"maps"
+	"fmt"
 
 	"github.com/nurtai325/qurtc/internal/ast"
 	"github.com/nurtai325/qurtc/internal/types"
 )
 
 type scope struct {
-	vars       map[string]types.Type
+	parentVars map[string]types.Type
+	childVars  map[string]types.Type
 	isLoop     bool
 	isContinue bool
 	isBreak    bool
@@ -19,7 +21,8 @@ func newFuncScope(funcDecl *ast.FuncDecl, args []types.Type) (*scope, error) {
 		return nil, ErrFuncArgMismatch
 	}
 	newScope := scope{
-		vars: make(map[string]types.Type, len(funcDecl.Args)),
+		parentVars: make(map[string]types.Type),
+		childVars:  make(map[string]types.Type, len(funcDecl.Args)),
 	}
 	for i, arg := range funcDecl.Args {
 		if !types.IsOfType(args[i], arg.Type) {
@@ -31,30 +34,48 @@ func newFuncScope(funcDecl *ast.FuncDecl, args []types.Type) (*scope, error) {
 }
 
 func (s *scope) add(name string, value types.Type) bool {
-	_, ok := s.vars[name]
+	_, ok := s.childVars[name]
 	if ok {
+		fmt.Println("hello", name, value, s.childVars)
 		return false
 	}
-	s.vars[name] = value
+	s.childVars[name] = value
 	return true
 }
 
 func (s *scope) get(name string) types.Type {
-	return s.vars[name]
+	val, ok := s.childVars[name]
+	if !ok {
+		return s.parentVars[name]
+	}
+	return val
 }
 
 func (s *scope) set(name string, value types.Type) bool {
-	_, ok := s.vars[name]
+	_, ok := s.childVars[name]
 	if !ok {
-		return false
+		_, ok := s.parentVars[name]
+		if !ok {
+			return false
+		}
+		s.parentVars[name] = value
+		return true
 	}
-	s.vars[name] = value
+	s.childVars[name] = value
 	return true
 }
 
-func (s *scope) clone() *scope {
+func (s *scope) newBlockScope() *scope {
 	return &scope{
-		vars:   maps.Clone(s.vars),
-		isLoop: s.isLoop,
+		parentVars: mergeScopes(s.parentVars, s.childVars),
+		childVars:  make(map[string]types.Type),
+		isLoop:     s.isLoop,
 	}
+}
+
+func mergeScopes(childScope, parentScope map[string]types.Type) map[string]types.Type {
+	merged := make(map[string]types.Type, len(childScope)+len(parentScope))
+	maps.Copy(merged, parentScope)
+	maps.Copy(merged, childScope)
+	return merged
 }
