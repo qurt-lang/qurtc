@@ -1,8 +1,6 @@
 package machine
 
 import (
-	"fmt"
-
 	"github.com/nurtai325/qurtc/internal/ast"
 	"github.com/nurtai325/qurtc/internal/parser"
 	"github.com/nurtai325/qurtc/internal/token"
@@ -26,16 +24,45 @@ func (m *machine) eval(exprScope *scope, expr ast.Expr) (types.Type, error) {
 		}
 		return variable, nil
 	case *ast.ArrayExpr:
-		fmt.Println("hello")
 		elements, err := m.evalAll(exprScope, v.Elements)
 		if err != nil {
-			fmt.Println("hello")
 			return nil, err
 		}
 		if !types.IsSameType(elements...) {
 			return nil, types.ErrNotSameType
 		}
 		return types.NewArray(elements)
+	case *ast.ArrayAccessExpr:
+		res, err := m.eval(exprScope, v.Array)
+		if err != nil {
+			return nil, err
+		}
+		arr, ok := res.(*types.Array)
+		if !ok {
+			return nil, ErrArrAccessOnNotArr
+		}
+		res, err = m.eval(exprScope, v.Index)
+		if err != nil {
+			return nil, err
+		}
+		index, ok := res.(types.Int)
+		if !ok {
+			return nil, ErrArrAccessOnNotArr
+		}
+		return arr.Get(int(index))
+	case *ast.SelectorExpr:
+		val, err := m.eval(exprScope, v.Struct)
+		if err != nil {
+			return nil, err
+		}
+		structVal, ok := val.(*types.Struct)
+		if !ok {
+			return nil, ErrStructAccessNotOnStruct
+		}
+		if v.Field == nil {
+			return structVal, nil
+		}
+		return structVal.Get(v.Field.Value)
 	case *ast.CallExpr:
 		args, err := m.evalAll(exprScope, v.Args)
 		if err != nil {

@@ -6,7 +6,19 @@ import (
 	"github.com/nurtai325/qurtc/internal/ast"
 )
 
-func ZeroOf(typ *ast.Type) (Type, error) {
+func ZeroOf(typ *ast.Type, structTypes map[string]*ast.StructDecl) (Type, error) {
+	if typ.IsArray {
+		typ.IsArray = false
+		elements := make([]Type, 0, typ.ArrayLen)
+		for range typ.ArrayLen {
+			val, err := ZeroOf(typ, structTypes)
+			if err != nil {
+				return nil, err
+			}
+			elements = append(elements, val)
+		}
+		return NewArray(elements)
+	}
 	switch typ.Kind {
 	case ast.TInt:
 		return Int(0), nil
@@ -16,6 +28,20 @@ func ZeroOf(typ *ast.Type) (Type, error) {
 		return String(""), nil
 	case ast.TBool:
 		return Bool(false), nil
+	case ast.TStruct:
+		structDecl, ok := structTypes[typ.Name.Value]
+		if !ok {
+			return nil, ErrUnknownType
+		}
+		fields := make(map[string]Type, len(structDecl.Fields))
+		for _, field := range structDecl.Fields {
+			val, err := ZeroOf(field.Type, structTypes)
+			if err != nil {
+				return nil, err
+			}
+			fields[field.Name] = val
+		}
+		return NewStruct(structDecl.Name.Value, fields)
 	default:
 		return nil, ErrUnknownType
 	}
@@ -43,6 +69,8 @@ func IsOfType(val Type, typ *ast.Type) bool {
 			}
 		}
 		return true
+	case *Struct:
+		return typ.Kind == ast.TStruct && typ.Name.Value == v.name
 	default:
 		return false
 	}

@@ -23,6 +23,11 @@ type (
 		elements []Type
 		length   int
 	}
+
+	Struct struct {
+		name   string
+		fields map[string]Type
+	}
 )
 
 func (b Bool) String() string {
@@ -46,3 +51,5 @@ func (String) aType() {}
 func (Bool) aType() {}
 
 func (*Array) aType() {}
+
+func (*Struct) aType() {}

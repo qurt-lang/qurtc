@@ -12,7 +12,7 @@ func (a *Array) Len() int {
 }
 
 func (a *Array) Get(i int) (Type, error) {
-	if len(a.elements) <= i || i < 0 {
+	if a.isOutOfBound(i) {
 		return nil, ErrOutOfBound
 	}
 	return a.elements[i], nil
@@ -29,7 +29,7 @@ func (a *Array) Set(i int, val Type) error {
 }
 
 func (a *Array) isOutOfBound(i int) bool {
-	if len(a.elements) <= i || i < 0 {
+	if a.length <= i || i < 0 {
 		return true
 	}
 	return false
