@@ -8,7 +8,10 @@ import (
 )
 
 type scope struct {
-	vars map[string]types.Type
+	vars       map[string]types.Type
+	isLoop     bool
+	isContinue bool
+	isBreak    bool
 }
 
 func newFuncScope(funcDecl *ast.FuncDecl, args []types.Type) (*scope, error) {
@@ -51,6 +54,7 @@ func (s *scope) set(name string, value types.Type) bool {
 
 func (s *scope) clone() *scope {
 	return &scope{
-		vars: maps.Clone(s.vars),
+		vars:   maps.Clone(s.vars),
+		isLoop: s.isLoop,
 	}
 }

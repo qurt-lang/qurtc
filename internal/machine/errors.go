@@ -1,6 +1,8 @@
 package machine
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	ErrNoMain          = errors.New("негізгі деп аталатын функция болуы керек")
@@ -18,4 +20,9 @@ var (
 	ErrArrAccessOnNotArr       = errors.New("тізім мүшесін алу операциясы тек тізімдерге ғана болады және индекс мәні бүтін шығуы керек")
 	ErrStructAccessNotOnStruct = errors.New("құрылым мүшесін алу операциясы тек құрылымдарға ғана болады")
 	ErrInvalidAssign           = errors.New("айнымалы мәнін өзгертудің ережелері сақталмаған")
+	ErrIfWithNoBool            = errors.New("егер нұсқауының шарты тек шын типі бола алады")
+	ErrInvalidElse             = errors.New("егер нұсқауының әйтпесе бөлігі ережеге сай емес")
+	ErrInvalidFor              = errors.New("қайтала нұсқауын жасаудың ережесі сақталмаған")
+	ErrContinueInNotLoop       = errors.New("өткіз нұсқауын тек қайтала нұсқауының денесінде қолдануға болады")
+	ErrBreakInNotLoop          = errors.New("тоқта нұсқауын тек қайтала нұсқауының денесінде қолдануға болады")
 )

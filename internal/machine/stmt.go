@@ -91,7 +91,98 @@ func (m *machine) exec(parentScope *scope, stmt ast.Stmt) (types.Type, error) {
 			return nil, err
 		}
 		return nil, nil
+	case *ast.IfStmt:
+		res, err := m.eval(parentScope, v.Cond)
+		if err != nil {
+			return nil, err
+		}
+		cond, ok := res.(types.Bool)
+		if !ok {
+			return nil, ErrIfWithNoBool
+		}
+		ifScope := parentScope.clone()
+		if cond == false {
+			if v.Else == nil {
+				return nil, nil
+			}
+			switch elseBlock := v.Else.(type) {
+			case ast.Stmts:
+				return m.execBlock(ifScope.clone(), v.Then)
+			case *ast.IfStmt:
+				return m.exec(ifScope, elseBlock)
+			default:
+				return nil, ErrInvalidElse
+			}
+		}
+		return m.execBlock(ifScope, v.Then)
+	case *ast.ForStmt:
+		loopScope := parentScope.clone()
+		loopScope.isLoop = true
+		_, err := m.exec(loopScope, v.Init)
+		if err != nil {
+			return nil, err
+		}
+
+		for {
+			res, err := m.eval(loopScope, v.Cond)
+			if err != nil {
+				return nil, err
+			}
+			cond, ok := res.(types.Bool)
+			if !ok {
+				return nil, ErrIfWithNoBool
+			}
+			if !cond {
+				break
+			}
+
+			retVal, err := m.execBlock(loopScope, v.Body)
+			if err != nil {
+				return nil, err
+			}
+			if retVal != nil {
+				return retVal, nil
+			}
+			if loopScope.isBreak {
+				break
+			}
+
+			_, err = m.exec(loopScope, v.Post)
+			if err != nil {
+				return nil, err
+			}
+		}
+		return nil, nil
+	case *ast.ContinueStmt:
+		if !parentScope.isLoop {
+			return nil, ErrContinueInNotLoop
+		}
+		parentScope.isContinue = true
+		return nil, nil
+	case *ast.BreakStmt:
+		if !parentScope.isLoop {
+			return nil, ErrBreakInNotLoop
+		}
+		parentScope.isBreak = true
+		return nil, nil
 	default:
 		return nil, parser.ErrUnknownStmt
 	}
+}
+
+func (m *machine) execBlock(currScope *scope, block []ast.Stmt) (types.Type, error) {
+	for _, stmt := range block {
+		retVal, err := m.exec(currScope, stmt)
+		if err != nil {
+			return nil, err
+		}
+		if retVal != nil {
+			return retVal, nil
+		}
+		if currScope.isContinue {
+			break
+		}
+	}
+	// return nil because func body didn't return anything
+	return nil, nil
 }
