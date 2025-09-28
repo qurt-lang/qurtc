@@ -4,7 +4,7 @@ COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 
 COPY ./landing /usr/share/nginx/html
 COPY ./assets /usr/share/nginx/html/assets
-COPY ./editor /usr/share/nginx/html/editor
+COPY ./tour /usr/share/nginx/html/tour
 
 COPY ./nginx/99-autoreload.sh /docker-entrypoint.d/99-autoreload.sh
 
