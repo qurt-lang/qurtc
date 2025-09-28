@@ -1,5 +1,7 @@
 FROM nginx:latest
 
+ENV APP_DOMAIN="qurt.tech"
+
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 
 COPY ./landing /usr/share/nginx/html
