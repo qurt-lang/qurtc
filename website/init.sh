@@ -94,4 +94,4 @@ docker compose -f "docker-compose.yml" run --rm --entrypoint "\
 echo
 
 echo "### Reloading nginx ..."
-docker compose -f "docker-compose.yml" exec nginx nginx -s reload
+docker compose -f "docker-compose.yml" exec website nginx -s reload
