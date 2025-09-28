@@ -21,12 +21,6 @@ sudo apt-get update
 
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
-
-# Source the .env file
-if [ -f .env ]; then
-  export $(grep -v '^#' .env | xargs)
-fi
-
 if ! [ -x "$(command -v docker compose)" ]; then
     echo 'Error: docker compose is not installed.' >&2
     exit 1
