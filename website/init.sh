@@ -62,7 +62,6 @@ docker compose  -f "docker-compose.yml" run --rm --entrypoint "\
 echo
 
 echo "### Requesting Let's Encrypt certificate for $domains ..."
-sleep 120
 #Join $domains to -d args
 domain_args=""
 for domain in "${domains[@]}"; do
