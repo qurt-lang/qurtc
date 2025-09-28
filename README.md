@@ -13,7 +13,6 @@
 ## 🌐 Explore Qurt
 
 - **Official Website**: [qurt.tech](https://qurt.tech)
-- **GitHub Repository**: [github.com/nurtai325/qurt](https://github.com/nurtai325/qurtc)
 
 ---
 
