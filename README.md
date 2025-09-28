@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="https://qurt.tech/assets/logo.png" alt="Qurt Logo" width="100" /><br/>
+  <img src="https://qurt.tech/assets/images/logo.png" alt="Qurt Logo" width="100" /><br/>
   Qurt
 </h1>
 
