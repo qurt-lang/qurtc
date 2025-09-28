@@ -32,7 +32,7 @@ if ! [ -x "$(command -v docker compose)" ]; then
     exit 1
 fi
 
-domains=(${APP_DOMAIN:-example.com})
+domains="qurt.tech"
 rsa_key_size=4096
 data_path="./nginx/certbot"
 email=""
