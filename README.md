@@ -1,24 +1,72 @@
-# 🚀 Qurt: A Powerful Programming Language in Kazakh. Visit [qurt.tech](https://qurt.tech)
+<h1 align="center">
+  <img src="https://qurt.tech/assets/logo.png" alt="Qurt Logo" width="100" /><br/>
+  Qurt
+</h1>
 
-![Qurt Logo](https://qurt.tech/images/logo.png)
+<p align="center">
+  <b>A beginner-friendly programming language, fully in Kazakh.</b><br/>
+  Designed for clarity, accessibility, and native-language learning — built to empower students and educators.
+</p>
 
-**Qurt** is a strongly typed, interpreted, easy to use programming language designed to teach the fundamentals of coding in **Kazakh**. Tailored for educators, students, and developers, **Qurt** bridges the gap between technology and native language, fostering an inclusive learning environment.
-
-> 🏫**Real world usage** — currently used in schools near Almaty to help students learn programming through a culturally relevant and intuitive platform.
-
-> ⚡**Blazingly fast** — the project takes advantage of advanced caching and load time optimization techniques. It is fully static. Even the **Qurt** interpreter compiled to wasm and included in the site.
+<p align="center">
+  <a href="https://qurt.tech">🌐 Official Website</a> •
+  <a href="#getting-started">🚀 Getting Started</a> •
+  <a href="#documentation">📚 Documentation</a> •
+  <a href="#contributing">🤝 Contribute</a>
+</p>
 
 ---
 
-## 🌐 Explore Qurt
+## ✨ Features
 
-- **Official Website**: [qurt.tech](https://qurt.tech)
+- **Fully in Kazakh** — Designed for native-language education
+- **Interpreted** — Can run both natively and directly in the browser (via WebAssembly)
+- **Beginner-Friendly** — Clean syntax & strong typing
+- **Real-World Usage** — Used in schools near Almaty
+- **Fast & Lightweight** — Fully static site and runtime
 
 ---
 
-## 🛠️ How to learn
-In the official website there is documentation and tutorials. In addition to that in the examples folder there are a few examples that showcase the features of the language.
+## 🚀 Getting Started
 
-## 🛠️ Contribute
+You can run Qurt right in your browser — no installation required.
 
-We are welcome to contributers that can make spare time to help drive the Kazakh programming community
+### 👉 Try it online
+
+> 💻 [Open the Qurt Playground »](https://qurt.tech/editor)
+
+---
+
+## 📚 Documentation
+
+- 📖 Full Docs and Tutorials are available in the official website: [https://qurt.tech](https://qurt.tech)
+- 🧪 Examples: Check the [`examples/`](./examples) folder in this repo
+
+---
+
+## 💡 Example Code
+
+Examples available in the [`examples/`](./examples) folder and on the [Qurt website](https://qurt.tech).
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from developers, educators, and language enthusiasts.
+
+### How to Help
+
+- Improve or translate documentation
+- Fix bugs or suggest new features
+- Create new learning materials in Kazakh
+- Improve the interpreter or tooling
+
+> 📬 Open an issue or pull request to get involved.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE) for details.
+
+---
