@@ -10,4 +10,6 @@ COPY ./nginx/99-autoreload.sh /docker-entrypoint.d/99-autoreload.sh
 
 RUN chmod +x /docker-entrypoint.d/99-autoreload.sh
 
+RUN echo hello
+
 EXPOSE 80 443

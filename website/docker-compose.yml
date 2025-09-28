@@ -3,7 +3,6 @@ services:
     container_name: qurt-website
     restart: unless-stopped
     image: nurtai325/qurt-website:latest
-    env_file: .env
     volumes:
       - ./nginx/certbot/conf:/etc/letsencrypt
       - ./nginx/certbot/www:/var/www/certbot
