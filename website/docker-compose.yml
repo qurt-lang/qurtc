@@ -1,0 +1,13 @@
+services:
+  web:
+    image: nginx:stable-bookworm
+    container_name: qurt-web
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./landing:/usr/share/nginx/html
+      - ./assets:/usr/share/nginx/html/assets
+      - ./editor/dist:/usr/share/nginx/html/editor
+      - /etc/letsencrypt:/etc/letsencrypt
+    ports:
+      - "80:80"
+      - "443:443"
