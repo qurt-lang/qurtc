@@ -90,4 +90,4 @@ echo
 echo "### Reloading nginx ..."
 docker compose -f "docker-compose.yml" exec website nginx -s reload
 
-docker compose up
+docker compose up -d
