@@ -1,15 +1,10 @@
 services:
   website:
     container_name: qurt-website
-    image: nurtai325/qurt-website:latest
     restart: unless-stopped
+    image: nginx:nginx:latest
     env_file: .env
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./landing:/usr/share/nginx/html
-      - ./assets:/usr/share/nginx/html/assets
-      - ./editor:/usr/share/nginx/html/editor
-      - ./nginx/99-autoreload.sh:/docker-entrypoint.d/99-autoreload.sh
       - ./nginx/certbot/conf:/etc/letsencrypt
       - ./nginx/certbot/www:/var/www/certbot
     ports:
