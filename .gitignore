@@ -2,3 +2,4 @@
 bin/
 *.gz
 website/nginx/certbot/
+website/assets/wasm/qurtc.wasm

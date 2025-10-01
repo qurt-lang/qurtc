@@ -15,6 +15,7 @@ const (
 )
 
 func Main() error {
+	// TODO: try not to panic it stops the whole program in the browser
 	js.Global().Set(execFnName, js.FuncOf(func(this js.Value, args []js.Value) any {
 		stdout := strings.Builder{}
 		source := args[0].String()
@@ -25,5 +26,5 @@ func Main() error {
 		}
 		return stdout.String()
 	}))
-	return nil
+	select{}
 }

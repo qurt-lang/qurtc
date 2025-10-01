@@ -1,1 +1,53 @@
-hello
+<!DOCTYPE html>
+<html lang="kk">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Qurt - қазақ тілінде бағдарламалау</title>
+		<link rel="icon" href="/assets/images/favicon.ico" type="image/x-icon">
+		<link rel="stylesheet" href="/assets/css/tour.css">
+	</head>
+	<body>
+		<header class="navbar">
+			<div class="container">
+				<div class="logo">
+					<img src="/assets/images/logo.jpeg" alt="Qurt Logo" class="logo-img">
+					<a href="/" class="logo-text">Qurt Tour</a>
+				</div>
+				<div class="page-indicator">
+					<span id="currentPage">1</span> / <span id="totalPages">5</span>
+				</div>
+			</div>
+		</header>
+
+		<div class="tour-container">
+			<aside class="sidebar">
+				<div id="lessonContent" class="lesson-content"></div>
+
+				<div class="navigation">
+					<button id="prevBtn" class="btn secondary-btn" disabled>← Артқа</button>
+					<button id="nextBtn" class="btn primary-btn">Алға →</button>
+				</div>
+			</aside>
+
+			<div class="editor-panel">
+				<div class="editor-header">
+					<span class="editor-title">негізгі.құрт</span>
+					<button id="runBtn" class="run-btn">▶ Іске қосу</button>
+				</div>
+
+				<div class="editor-wrapper">
+					<textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+				</div>
+
+				<div class="output-section">
+					<div class="output-header">Нәтиже:</div>
+					<div id="output" class="output-content"></div>
+				</div>
+			</div>
+		</div>
+
+		<script src="/assets/js/wasm_exec.js"></script>
+		<script src="/assets/js/tour.js"></script>
+	</body>
+</html>

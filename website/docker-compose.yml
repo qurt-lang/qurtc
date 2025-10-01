@@ -15,7 +15,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       WATCHTOWER_REVIVE_STOPPED: true
-    command: --interval 60
+    command: --interval 10
   certbot:
     image: certbot/certbot
     volumes:
