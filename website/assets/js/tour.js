@@ -180,6 +180,6 @@ nextBtn.addEventListener('click', () => {
 	}
 });
 runBtn.addEventListener('click', () => {
-	output.textContent = 'hello';
+	output.textContent = qurtExec(codeEditor.value);
 });
 updateLesson();
