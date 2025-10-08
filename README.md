@@ -33,7 +33,7 @@ You can run Qurt right in your browser — no installation required.
 
 ### 👉 Try it online
 
-> 💻 [Open the Qurt Playground »](https://qurt.tech/editor)
+> 💻 [Open the Qurt Playground »](https://qurt.tech/tour)
 
 ---
 
